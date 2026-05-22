@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    width: 100%;
+    height: 100%;
+  }
+
+  body {
+    background: #0a0a1a;
+    color: #e0e0f0;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0a1a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1e1e3f;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00f0ff44;
+  }
+}
+
+@layer components {
+  .cyber-panel {
+    @apply bg-cyber-panel border border-cyber-border rounded-lg backdrop-blur-sm;
+  }
+  .cyber-btn {
+    @apply px-3 py-1.5 text-xs font-medium border border-cyber-accent/40 text-cyber-accent
+           rounded hover:bg-cyber-accent/10 transition-colors cursor-pointer
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .cyber-btn-active {
+    @apply cyber-btn bg-cyber-accent/20 border-cyber-accent;
+  }
+
+  /* Scene shell: stable full-height canvas */
+  .office-canvas-wrapper {
+    @apply w-full h-full relative overflow-hidden;
+  }
+
+  .office-canvas-wrapper canvas {
+    display: block;
+  }
+
+  /* HUD overlays: keep within viewport */
+  .office-hud-overlay {
+    @apply absolute inset-0 pointer-events-none;
+  }
+
+  .office-hud-overlay > * {
+    pointer-events: auto;
+  }
+
+  /* Narrow screen: compact status bar */
+  @media (max-width: 640px) {
+    .status-bar-text {
+      @apply text-[10px] leading-tight;
+    }
+  }
+}
