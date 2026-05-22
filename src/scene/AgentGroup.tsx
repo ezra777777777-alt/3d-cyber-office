@@ -1,6 +1,7 @@
 import { useOfficeStore } from '@/store/officeStore';
 import { Desk } from './Desk';
 import { AgentCharacter } from './AgentCharacter';
+import { DeskStatusBeacon } from './DeskStatusBeacon';
 
 interface AgentGroupProps {
   deskId: string;
@@ -21,11 +22,16 @@ export function AgentGroup({ deskId }: AgentGroupProps) {
     <group>
       <Desk deskId={desk.id} position={desk.position} rotation={desk.rotation} label={desk.label} isCommander={desk.isCommander} />
       {agent && (
-        <AgentCharacter
-          agentId={agent.id}
-          position={agentPos}
-          deskRotation={desk.rotation}
-        />
+        <>
+          <group position={desk.position}>
+            <DeskStatusBeacon status={agent.status} />
+          </group>
+          <AgentCharacter
+            agentId={agent.id}
+            position={agentPos}
+            deskRotation={desk.rotation}
+          />
+        </>
       )}
     </group>
   );
