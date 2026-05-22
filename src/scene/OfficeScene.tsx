@@ -9,8 +9,7 @@ import { CameraController } from './CameraController';
 import { MeetingTable } from './MeetingTable';
 import { Whiteboard } from './Whiteboard';
 import { Cabinet } from './Cabinet';
-import { Plant } from './Plant';
-import { CeilingLamps } from './CeilingLamp';
+import { SceneDecor } from './SceneDecor';
 import { PendingMarker, DoneMarker } from './ZoneMarkers';
 import { ResetCameraBtn } from '@/ui/ResetCameraBtn';
 import { defaultLayout } from '@/data/defaultLayout';
@@ -39,8 +38,8 @@ export function OfficeScene() {
           <ZoneLabel key={zone.id} zone={zone} />
         ))}
 
-        {/* Ceiling lamps */}
-        <CeilingLamps />
+        {/* Environmental decor: lamps, plants, delivery rack, rest corner */}
+        <SceneDecor />
 
         {/* Main work area — 4 workstations */}
         <group>
@@ -61,11 +60,6 @@ export function OfficeScene() {
         {/* Completed zone — cabinet + marker */}
         <Cabinet />
         <DoneMarker />
-
-        {/* Decorative plants */}
-        <Plant position={[8.8, 0, -5.5]} />
-        <Plant position={[-8.8, 0, -5.5]} scale={0.9} />
-        <Plant position={[0, 0, 5.5]} scale={0.8} />
 
         <CameraController />
         <ResetCameraBtn />
