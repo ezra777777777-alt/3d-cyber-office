@@ -1,15 +1,18 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useUIStore } from '@/store/uiStore';
 import { useOfficeStore } from '@/store/officeStore';
 import { useEventStore } from '@/store/eventStore';
 import { subscribe } from '@/core/event-bus';
 import { applyTaskEvent, deriveAgentStatus } from '@/core/state-machine';
+import { useCommanderStore } from '@/store/commanderStore';
 import { Navigation } from './Navigation';
 import { StatusBar } from './StatusBar';
 import { SidePanel } from './SidePanel';
 import { EventFeed } from './EventFeed';
 import { DemoControls } from './DemoControls';
 import { ResetCameraBtn } from './ResetCameraBtn';
+import { CommanderDock } from './commander/CommanderDock';
+import { RuntimeModeSwitch } from './runtime/RuntimeModeSwitch';
 import { OfficeScene } from '@/scene/OfficeScene';
 import { CalendarView } from './dashboard/CalendarView';
 import { LogsView } from './dashboard/LogsView';
@@ -17,8 +20,16 @@ import { FilesView } from './dashboard/FilesView';
 import { CronJobsView } from './dashboard/CronJobsView';
 import { GatewayStatus } from './dashboard/GatewayStatus';
 import { DailyReview } from './dashboard/DailyReview';
-import { startDemoEngine, stopDemoEngine } from '@/demo/demoEngine';
-import { fullDemoScenario } from '@/demo/scenarios';
+import { TasksView } from './dashboard/TasksView';
+import { RestView } from './dashboard/RestView';
+import { MigrationView } from './dashboard/MigrationView';
+import { stopDemoEngine } from '@/demo/demoEngine';
+import { dispatch } from '@/core/event-bus';
+import { createMockRuntimeAdapter } from '@/runtime/mockRuntimeAdapter';
+import { createOpenClawAdapter } from '@/runtime/openClawAdapter';
+import { useRuntimeStore } from '@/store/runtimeStore';
+import { useDashboardStore } from '@/store/dashboardStore';
+import { runtimeEventToWorkbenchTaskStatus } from './dashboard/workbenchTesting';
 import type { AgentStatus } from '@/core/types';
 
 export function AppShell() {
@@ -26,7 +37,6 @@ export function AppShell() {
   const demoRunning = useUIStore((s) => s.demoRunning);
   const demoPaused = useUIStore((s) => s.demoPaused);
   const setDemoRunning = useUIStore((s) => s.setDemoRunning);
-  const engineRef = useRef(false);
 
   // Subscribe to event bus on mount
   useEffect(() => {
@@ -37,6 +47,7 @@ export function AppShell() {
       if (event.type === 'office.demo_reset') {
         useEventStore.getState().clear();
         store.reset();
+        useCommanderStore.getState().resetCommander();
         return;
       }
 
@@ -93,6 +104,43 @@ export function AppShell() {
         }
       }
 
+      // Commander event projection
+      if (event.missionId) {
+        useCommanderStore.getState().ingestCommanderEvent(event);
+      }
+
+      // Auto-resolve approval if scenario fires approval.resolved
+      if (event.type === 'approval.resolved' && event.approvalId) {
+        const resolution = String(event.payload.resolution ?? 'approved');
+        const note = String(event.payload.note ?? 'Resolved via demo.');
+        useCommanderStore.getState().resolveApproval(
+          event.approvalId,
+          resolution as 'approved' | 'rejected',
+          note,
+        );
+      }
+
+      // Runtime event → workbench task projection
+      if (event.source === 'runtime' && event.taskId) {
+        const status = runtimeEventToWorkbenchTaskStatus(event.type);
+        if (status) {
+          const hasTitle = typeof event.payload.title === 'string';
+          const hasSummary = typeof event.payload.summary === 'string';
+          const dashboardStore = useDashboardStore.getState();
+          dashboardStore.upsertRuntimeWorkbenchTask({
+            id: `wb-runtime-${event.taskId}`,
+            ...(hasTitle ? { title: event.payload.title as string } : {}),
+            status,
+            source: 'runtime',
+            officeTaskId: event.taskId,
+            agentId: event.agentId,
+            dueLabel: 'Runtime',
+            priority: status === 'blocked' ? 'high' : 'medium',
+            ...(hasSummary ? { summary: event.payload.summary as string } : {}),
+          });
+        }
+      }
+
       // User actions (completion, stage toggle, etc.)
       if (event.type === 'user.action') {
         if (event.payload.action === 'complete' && event.taskId) {
@@ -124,54 +172,68 @@ export function AppShell() {
 
   // Run demo engine when demoRunning changes
   useEffect(() => {
-    if (demoRunning && !engineRef.current) {
-      engineRef.current = true;
-      startDemoEngine(fullDemoScenario());
-    }
     if (!demoRunning) {
       stopDemoEngine();
-      engineRef.current = false;
     }
   }, [demoRunning]);
+
+  // Start runtime adapter when mode switches
+  const runtimeMode = useRuntimeStore((s) => s.mode);
+  const runtimeEndpoint = useRuntimeStore((s) => s.endpoint);
+  useEffect(() => {
+    if (runtimeMode === 'demo' || runtimeMode === 'offline' || runtimeMode === 'error') return;
+
+    const runtimeStore = useRuntimeStore.getState();
+    let adapter;
+
+    if (runtimeMode === 'mock') {
+      adapter = createMockRuntimeAdapter();
+    } else if (runtimeMode === 'connected') {
+      adapter = createOpenClawAdapter({ endpoint: runtimeEndpoint, protocol: 'openclaw', version: '0.4.0' });
+    } else {
+      return;
+    }
+
+    runtimeStore.setStatus('connecting');
+    adapter.start((normalized) => {
+      runtimeStore.addRawEvent(normalized.raw);
+      runtimeStore.addDiagnostics(normalized.diagnostics);
+      if (normalized.event?.type === 'runtime.heartbeat') {
+        runtimeStore.setLastHeartbeatAt(normalized.event.occurredAt);
+      }
+      if (normalized.event) dispatch(normalized.event);
+      runtimeStore.setStatus(adapter.getStatus());
+    });
+    // Capture synchronous status change (e.g., protocol_mismatch from connected mode placeholder)
+    runtimeStore.setStatus(adapter.getStatus());
+
+    return () => {
+      adapter.stop();
+      runtimeStore.setStatus(adapter.getStatus());
+    };
+  }, [runtimeMode, runtimeEndpoint]);
 
   return (
     <div className="w-full h-full flex flex-col bg-cyber-dark">
       <Navigation />
       <StatusBar />
+      <div className="flex items-center px-4 py-1 border-b border-cyber-border bg-cyber-dark/60">
+        <RuntimeModeSwitch />
+      </div>
       <div className="flex-1 flex relative overflow-hidden">
-        {/* Main content area */}
-        <div className="flex-1 relative">
-          {activeModule === 'office' ? (
+        {activeModule === 'office' ? (
+          /* Office: SidePanel floats as absolute overlay over 3D canvas */
+          <div className="flex-1 relative">
             <OfficeScene />
-          ) : activeModule === 'calendar' ? (
-            <CalendarView />
-          ) : activeModule === 'logs' ? (
-            <LogsView />
-          ) : activeModule === 'files' ? (
-            <FilesView />
-          ) : activeModule === 'cronjobs' ? (
-            <CronJobsView />
-          ) : activeModule === 'gateway' ? (
-            <GatewayStatus />
-          ) : activeModule === 'review' ? (
-            <DailyReview />
-          ) : (
-            <OfficeScene />
-          )}
-
-          {/* SidePanel visible in all modules when selection exists */}
-          <div className="absolute top-2 right-2 z-10">
-            <SidePanel />
-          </div>
-          {/* Camera reset — office mode, top-right, outside Canvas DOM */}
-          {activeModule === 'office' && (
+            <div className="absolute top-2 right-2 z-10">
+              <SidePanel />
+            </div>
+            <div className="absolute top-2 left-2 z-10 pointer-events-auto">
+              <CommanderDock />
+            </div>
             <div className="absolute top-2 right-2 z-20 pointer-events-auto">
               <ResetCameraBtn />
             </div>
-          )}
-
-          {/* Event feed & demo controls always visible in office mode */}
-          {activeModule === 'office' && (
             <div className="absolute bottom-2 left-2 right-2 z-20 flex gap-2 bottom-hud pointer-events-auto">
               <div className="flex-1 min-w-0">
                 <EventFeed />
@@ -180,8 +242,38 @@ export function AppShell() {
                 <DemoControls />
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          /* Workbench: SidePanel docks on the right (desktop), overlays on narrow screens */
+          <div className="flex-1 flex min-h-0">
+            <div className="flex-1 min-w-0 overflow-hidden">
+              {activeModule === 'calendar' ? (
+                <CalendarView />
+              ) : activeModule === 'tasks' ? (
+                <TasksView />
+              ) : activeModule === 'logs' ? (
+                <LogsView />
+              ) : activeModule === 'files' ? (
+                <FilesView />
+              ) : activeModule === 'cronjobs' ? (
+                <CronJobsView />
+              ) : activeModule === 'gateway' ? (
+                <GatewayStatus />
+              ) : activeModule === 'review' ? (
+                <DailyReview />
+              ) : activeModule === 'rest' ? (
+                <RestView />
+              ) : activeModule === 'migration' ? (
+                <MigrationView />
+              ) : (
+                <OfficeScene />
+              )}
+            </div>
+            <div className="max-sm:absolute max-sm:right-0 max-sm:top-0 max-sm:z-30 max-sm:h-full max-sm:overflow-y-auto">
+              <SidePanel />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

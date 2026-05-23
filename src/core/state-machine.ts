@@ -1,12 +1,13 @@
 import type { TaskStatus, AgentStatus, Task, Agent } from './types';
 
 const VALID_TASK_TRANSITIONS: Record<TaskStatus, TaskStatus[]> = {
-  created: ['queued', 'cancelled'],
+  created: ['planned', 'queued', 'cancelled'],
+  planned: ['queued', 'assigned', 'cancelled'],
   queued: ['assigned', 'cancelled'],
-  assigned: ['running', 'cancelled', 'queued'],
+  assigned: ['running', 'cancelled'],
   running: ['waiting_input', 'approval_required', 'blocked', 'failed', 'completed', 'cancelled'],
-  waiting_input: ['running', 'failed', 'cancelled'],
-  approval_required: ['running', 'failed', 'cancelled'],
+  waiting_input: ['running', 'blocked', 'failed', 'cancelled'],
+  approval_required: ['running', 'blocked', 'failed', 'cancelled'],
   blocked: ['running', 'failed', 'cancelled'],
   failed: ['queued', 'cancelled'],
   completed: [],
@@ -37,6 +38,7 @@ export function canTransitionAgent(from: AgentStatus, to: AgentStatus): boolean 
 export function applyTaskEvent(task: Task, eventType: string): TaskStatus | null {
   const eventToStatus: Record<string, TaskStatus> = {
     'task.created': 'created',
+    'task.planned': 'planned',
     'task.queued': 'queued',
     'task.assigned': 'assigned',
     'task.started': 'running',

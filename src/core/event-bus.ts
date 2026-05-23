@@ -1,5 +1,7 @@
 import type { OfficeEvent, EventType } from './types';
 
+type EventMeta = Pick<OfficeEvent, 'source' | 'missionId' | 'approvalId' | 'artifactId'>;
+
 let eventCounter = 0;
 
 export function createEvent(
@@ -7,14 +9,19 @@ export function createEvent(
   taskId: string | null,
   agentId: string | null,
   payload: Record<string, unknown> = {},
+  meta: EventMeta = {},
 ): OfficeEvent {
   eventCounter += 1;
   return {
     id: `event-${String(eventCounter).padStart(4, '0')}`,
     type,
     occurredAt: new Date().toISOString(),
+    source: meta.source,
+    missionId: meta.missionId,
     taskId,
     agentId,
+    approvalId: meta.approvalId,
+    artifactId: meta.artifactId,
     payload,
   };
 }
@@ -29,6 +36,7 @@ export function validateEvent(event: OfficeEvent): { valid: boolean; error?: str
 export type EventHandler = (event: OfficeEvent) => void;
 
 const handlers: EventHandler[] = [];
+const seenRuntimeEventIds = new Set<string>();
 
 export function subscribe(handler: EventHandler): () => void {
   handlers.push(handler);
@@ -44,6 +52,12 @@ export function dispatch(event: OfficeEvent): void {
     console.warn('[EventBus] Invalid event:', error, event);
     return;
   }
+
+  if (event.runtimeEventId) {
+    if (seenRuntimeEventIds.has(event.runtimeEventId)) return;
+    seenRuntimeEventIds.add(event.runtimeEventId);
+  }
+
   for (const handler of handlers) {
     try {
       handler(event);
@@ -55,5 +69,6 @@ export function dispatch(event: OfficeEvent): void {
 
 export function resetEventCounter(): void {
   eventCounter = 0;
+  seenRuntimeEventIds.clear();
   dispatch(createEvent('office.demo_reset', null, null, {}));
 }

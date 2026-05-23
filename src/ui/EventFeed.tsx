@@ -14,6 +14,15 @@ const EVENT_STYLES: Record<string, { color: string; icon: string }> = {
   'agent.status_changed': { color: '#b347ea', icon: '@' },
   'office.demo_reset': { color: '#666688', icon: 'R' },
   'user.action': { color: '#00e676', icon: 'ME' },
+  'user.message': { color: '#00e676', icon: 'MSG' },
+  'task.planned': { color: '#6366f1', icon: 'PL' },
+  'tool.called': { color: '#f59e0b', icon: 'TL' },
+  'artifact.created': { color: '#8b5cf6', icon: 'A+' },
+  'approval.requested': { color: '#f97316', icon: '?!' },
+  'approval.resolved': { color: '#22c55e', icon: 'OK' },
+  'commander.summary_ready': { color: '#00f0ff', icon: 'SUM' },
+  'runtime.heartbeat': { color: '#22c55e', icon: 'HB' },
+  'runtime.adapter_error': { color: '#ff3366', icon: 'ERR' },
 };
 
 export function EventFeed() {
@@ -31,6 +40,9 @@ export function EventFeed() {
           return (
             <div key={evt.id} className="flex gap-2 items-start text-xs hover:bg-white/5 rounded px-1 py-0.5">
               <span className="text-gray-600 whitespace-nowrap font-mono">{formatTime(evt.occurredAt)}</span>
+              {evt.source === 'runtime' && (
+                <span className="text-[#22c55e] font-mono text-[10px] px-0.5 border border-[#22c55e]/30 rounded">RT</span>
+              )}
               <span style={{ color: style.color }} className="font-mono w-6">{style.icon}</span>
               <span className="text-gray-300 truncate">{evt.type}</span>
               {evt.payload?.message != null && (

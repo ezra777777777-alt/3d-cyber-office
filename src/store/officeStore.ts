@@ -20,6 +20,7 @@ interface OfficeState {
   getTask: (id: string) => Task | undefined;
   getAllTasks: () => Task[];
   upsertTask: (task: Task) => void;
+  upsertTasks: (tasks: Task[]) => void;
   removeTask: (id: string) => void;
 
   // Desk
@@ -105,6 +106,12 @@ export const useOfficeStore = create<OfficeState>((set, get) => ({
     set((s) => {
       const next = new Map(s.tasks);
       next.set(task.id, task);
+      return { tasks: next };
+    }),
+  upsertTasks: (tasks) =>
+    set((s) => {
+      const next = new Map(s.tasks);
+      for (const task of tasks) next.set(task.id, task);
       return { tasks: next };
     }),
   removeTask: (id) =>

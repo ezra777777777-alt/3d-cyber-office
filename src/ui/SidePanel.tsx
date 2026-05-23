@@ -94,6 +94,12 @@ export function SidePanel() {
           {task.errorSummary && (
             <div className="text-cyber-danger border-l-2 border-cyber-danger pl-2">{task.errorSummary}</div>
           )}
+          {recentEvents.some((e) => e.source === 'runtime') && (
+            <div className="flex justify-between border-t border-cyber-border pt-2">
+              <span className="text-gray-500">Source</span>
+              <span className="text-[#22c55e] font-mono text-[10px]">RUNTIME</span>
+            </div>
+          )}
         </div>
       )}
 

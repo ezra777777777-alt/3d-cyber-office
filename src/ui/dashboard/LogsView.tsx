@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useEventStore } from '@/store/eventStore';
 import { useOfficeStore } from '@/store/officeStore';
 import { useUIStore } from '@/store/uiStore';
+import { filterEventRows } from './workbenchTesting';
+import type { EventRowLevel, EventRowSearchItem } from './workbenchTesting';
+import { WorkbenchHeader } from './WorkbenchHeader';
 
 const LEVEL_COLORS: Record<string, string> = {
   info: '#8888aa',
@@ -10,32 +13,43 @@ const LEVEL_COLORS: Record<string, string> = {
   success: '#00e676',
 };
 
+function getLevel(type: string): EventRowLevel {
+  if (type.includes('failed') || type.includes('blocked')) return 'error';
+  if (type.includes('waiting_input') || type.includes('approval')) return 'warn';
+  if (type.includes('completed')) return 'success';
+  return 'info';
+}
+
 export function LogsView() {
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<EventRowLevel | 'all'>('all');
+  const [query, setQuery] = useState('');
   const events = useEventStore((s) => s.events);
   const getTask = useOfficeStore((s) => s.getTask);
   const selectTask = useUIStore((s) => s.selectTask);
   const selectAgent = useUIStore((s) => s.selectAgent);
 
-  const displayEvents = [...events].reverse();
+  const rows: EventRowSearchItem[] = useMemo(
+    () =>
+      [...events].reverse().map((evt) => ({
+        id: evt.id,
+        type: evt.type,
+        message: evt.payload?.message != null ? String(evt.payload.message) : evt.type,
+        level: getLevel(evt.type),
+        taskId: evt.taskId,
+        agentId: evt.agentId,
+        occurredAt: evt.occurredAt,
+      })),
+    [events],
+  );
 
-  const getLevel = (type: string): string => {
-    if (type.includes('failed') || type.includes('blocked')) return 'error';
-    if (type.includes('waiting_input')) return 'warn';
-    if (type.includes('completed')) return 'success';
-    return 'info';
-  };
-
-  const filtered = filter === 'all'
-    ? displayEvents
-    : displayEvents.filter((e) => getLevel(e.type) === filter);
+  const filtered = filterEventRows(rows, query, filter);
 
   return (
-    <div className="p-6 h-full flex flex-col">
-      <h2 className="text-lg font-semibold text-cyber-accent mb-4">Logs</h2>
+    <div className="workbench-page flex flex-col">
+      <WorkbenchHeader title="Logs / Events" subtitle="Searchable event stream from the office engine." />
 
-      <div className="flex gap-2 mb-4">
-        {['all', 'info', 'warn', 'error', 'success'].map((f) => (
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        {(['all', 'info', 'warn', 'error', 'success'] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -48,33 +62,37 @@ export function LogsView() {
             {f}
           </button>
         ))}
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search task, approval, tool, runtime..."
+          className="min-w-[220px] flex-1 rounded border border-cyber-border bg-cyber-dark px-3 py-1.5 text-xs text-white outline-none focus:border-cyber-accent/50"
+        />
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-1">
         {filtered.length === 0 && (
           <div className="text-gray-600 text-sm text-center py-12">No log entries</div>
         )}
-        {filtered.map((evt) => {
-          const level = getLevel(evt.type);
+        {filtered.map((row) => {
+          const evt = events.find((e) => e.id === row.id);
           return (
             <div
-              key={evt.id}
+              key={row.id}
               className="flex gap-2 items-start text-xs hover:bg-white/5 rounded px-2 py-1.5 cursor-pointer"
               onClick={() => {
-                if (evt.taskId) selectTask(evt.taskId);
-                else if (evt.agentId) selectAgent(evt.agentId);
+                if (evt?.taskId) selectTask(evt.taskId);
+                else if (evt?.agentId) selectAgent(evt.agentId);
               }}
             >
               <span className="text-gray-600 font-mono whitespace-nowrap w-20">
-                {new Date(evt.occurredAt).toLocaleTimeString('zh-CN')}
+                {evt ? new Date(evt.occurredAt).toLocaleTimeString('zh-CN') : ''}
               </span>
-              <span className="font-mono w-16" style={{ color: LEVEL_COLORS[level] }}>
-                [{level.toUpperCase()}]
+              <span className="font-mono w-16" style={{ color: LEVEL_COLORS[row.level] }}>
+                [{row.level.toUpperCase()}]
               </span>
-              <span className="text-gray-300">{evt.type}</span>
-              {evt.payload?.message != null && (
-                <span className="text-gray-500 truncate">{String(evt.payload.message)}</span>
-              )}
+              <span className="text-gray-300">{row.type}</span>
+              <span className="text-gray-500 truncate">{row.message}</span>
             </div>
           );
         })}
