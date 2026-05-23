@@ -3,12 +3,15 @@ import { useUIStore } from '@/store/uiStore';
 const MODULES = [
   { id: 'office', label: 'Office' },
   { id: 'calendar', label: 'Calendar' },
+  { id: 'tasks', label: 'Tasks' },
   { id: 'logs', label: 'Logs' },
   { id: 'files', label: 'Files' },
   { id: 'cronjobs', label: 'Cron Jobs' },
   { id: 'gateway', label: 'Gateway' },
   { id: 'review', label: 'Review' },
-];
+  { id: 'rest', label: 'Rest' },
+  { id: 'migration', label: 'Migration' },
+] as const;
 
 export function Navigation() {
   const activeModule = useUIStore((s) => s.activeModule);
