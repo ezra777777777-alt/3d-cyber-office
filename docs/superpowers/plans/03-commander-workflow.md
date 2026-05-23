@@ -14,8 +14,8 @@
 
 Execute this plan after:
 
-1. `docs/superpowers/plans/2026-05-22-office-visual-fidelity.md`
-2. `docs/superpowers/plans/2026-05-22-workbench-fidelity.md`
+1. `docs/superpowers/plans/01-office-visual-fidelity.md`
+2. `docs/superpowers/plans/02-workbench-fidelity.md`
 
 Those plans establish the Commander desk focal point, richer Agent status cues, dashboard data seams, and Tasks/Files/Logs surfaces this workflow should link back into.
 

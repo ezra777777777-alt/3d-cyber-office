@@ -150,7 +150,7 @@ Every plan should:
 
 Execute:
 
-`docs/superpowers/plans/2026-05-22-office-visual-fidelity.md`
+`docs/superpowers/plans/01-office-visual-fidelity.md`
 
 This is the fastest route to make the current prototype look materially closer to the reference video while leaving stable seams for later workbench and runtime plans.
 
