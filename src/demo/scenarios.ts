@@ -15,17 +15,17 @@ export function scenarioNormal(): ScenarioStep[] {
   t += 1500;
   steps.push({ delayMs: t, event: createEvent('task.queued', 'task-001', null, {}) });
   t += 1000;
-  steps.push({ delayMs: t, event: createEvent('task.assigned', 'task-001', 'agent-research', {}) });
+  steps.push({ delayMs: t, event: createEvent('task.assigned', 'task-001', 'agent-coordinator', {}) });
   t += 800;
-  steps.push({ delayMs: t, event: createEvent('task.started', 'task-001', 'agent-research', { message: '开始分析视频内容...' }) });
+  steps.push({ delayMs: t, event: createEvent('task.started', 'task-001', 'agent-coordinator', { message: '开始分析视频内容...' }) });
   t += 2000;
-  steps.push({ delayMs: t, event: createEvent('task.progress', 'task-001', 'agent-research', { message: '正在分析视频抽帧与交互模式', progress: 0.3 }) });
+  steps.push({ delayMs: t, event: createEvent('task.progress', 'task-001', 'agent-coordinator', { message: '正在分析视频抽帧与交互模式', progress: 0.3 }) });
   t += 2000;
-  steps.push({ delayMs: t, event: createEvent('task.progress', 'task-001', 'agent-research', { message: '提取关键能力清单', progress: 0.6 }) });
+  steps.push({ delayMs: t, event: createEvent('task.progress', 'task-001', 'agent-coordinator', { message: '提取关键能力清单', progress: 0.6 }) });
   t += 2000;
-  steps.push({ delayMs: t, event: createEvent('task.progress', 'task-001', 'agent-research', { message: '整理完成，正在生成摘要', progress: 0.9 }) });
+  steps.push({ delayMs: t, event: createEvent('task.progress', 'task-001', 'agent-coordinator', { message: '整理完成，正在生成摘要', progress: 0.9 }) });
   t += 1500;
-  steps.push({ delayMs: t, event: createEvent('task.completed', 'task-001', 'agent-research', { message: '任务完成', outputSummary: '已生成需求文档 v0.2，含 21 个章节' }) });
+  steps.push({ delayMs: t, event: createEvent('task.completed', 'task-001', 'agent-coordinator', { message: '任务完成', outputSummary: '已生成需求文档 v0.2，含 21 个章节' }) });
 
   return steps;
 }

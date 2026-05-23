@@ -164,7 +164,7 @@ export function AppShell() {
           </div>
           {/* Event feed & demo controls always visible in office mode */}
           {activeModule === 'office' && (
-            <div className="absolute bottom-2 left-2 right-2 z-10 flex gap-2 bottom-hud">
+            <div className="absolute bottom-2 left-2 right-2 z-20 flex gap-2 bottom-hud pointer-events-auto">
               <div className="flex-1 min-w-0">
                 <EventFeed />
               </div>
