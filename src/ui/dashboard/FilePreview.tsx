@@ -3,7 +3,7 @@ import { SourceBadge } from './WorkbenchHeader';
 
 export function FilePreview({ file }: { file: FileRecord | undefined }) {
   if (!file) {
-    return <div className="cyber-panel p-4 text-sm text-gray-500">Select a file to preview its workbench artifact.</div>;
+    return <div className="cyber-panel p-4 text-sm text-gray-500">选择文件以预览其工作区产物。</div>;
   }
 
   return (
@@ -16,7 +16,7 @@ export function FilePreview({ file }: { file: FileRecord | undefined }) {
         <SourceBadge source={file.source} />
       </div>
       <div className="mt-4 rounded border border-cyber-border bg-cyber-dark/70 p-3 text-xs leading-6 text-gray-300 whitespace-pre-wrap">
-        {file.preview || 'Preview unavailable for this file type.'}
+        {file.preview || '此文件类型暂不支持预览。'}
       </div>
     </section>
   );

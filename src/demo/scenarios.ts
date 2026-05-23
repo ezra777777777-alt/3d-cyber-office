@@ -35,17 +35,17 @@ export function scenarioBlocked(): ScenarioStep[] {
   const steps: ScenarioStep[] = [];
   let t = 0;
 
-  steps.push({ delayMs: t, event: createEvent('task.created', 'task-002', null, { title: 'Office layout optimization', summary: '优化办公室场景布局' }) });
+  steps.push({ delayMs: t, event: createEvent('task.created', 'task-002', null, { title: '办公室布局优化', summary: '优化办公室场景布局与碰撞检测' }) });
   t += 1200;
   steps.push({ delayMs: t, event: createEvent('task.queued', 'task-002', null, {}) });
   t += 800;
   steps.push({ delayMs: t, event: createEvent('task.assigned', 'task-002', 'agent-coder', {}) });
   t += 600;
-  steps.push({ delayMs: t, event: createEvent('task.started', 'task-002', 'agent-coder', { message: '开始优化布局...' }) });
+  steps.push({ delayMs: t, event: createEvent('task.started', 'task-002', 'agent-coder', { message: '开始优化办公室布局…' }) });
   t += 2000;
   steps.push({ delayMs: t, event: createEvent('task.progress', 'task-002', 'agent-coder', { message: '检测到布局冲突', progress: 0.4 }) });
   t += 1500;
-  steps.push({ delayMs: t, event: createEvent('task.blocked', 'task-002', 'agent-coder', { message: '无法解析碰撞检测', errorSummary: 'Layout collision detected at desk-b1' }) });
+  steps.push({ delayMs: t, event: createEvent('task.blocked', 'task-002', 'agent-coder', { message: '无法解决碰撞检测冲突', errorSummary: 'Layout collision detected at desk-b1' }) });
 
   return steps;
 }
@@ -55,7 +55,7 @@ export function scenarioWaitingInput(): ScenarioStep[] {
   const steps: ScenarioStep[] = [];
   let t = 4500; // Start after initial delay
 
-  steps.push({ delayMs: t, event: createEvent('task.created', 'task-003', null, { title: 'Generate weekly report', summary: '生成本周工作总结报告' }) });
+  steps.push({ delayMs: t, event: createEvent('task.created', 'task-003', null, { title: '生成周度报告', summary: '生成本周工作总结报告' }) });
   t += 1000;
   steps.push({ delayMs: t, event: createEvent('task.queued', 'task-003', null, {}) });
   t += 800;

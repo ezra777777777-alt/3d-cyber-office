@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useOfficeStore } from '@/store/officeStore';
 import { useUIStore } from '@/store/uiStore';
 import { useDashboardStore } from '@/store/dashboardStore';
@@ -14,12 +14,14 @@ const TYPE_COLORS: Record<string, string> = {
   cron: '#ffb84d',
 };
 
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const WEEKDAY_LABELS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
 
 export function CalendarView() {
   const getTask = useOfficeStore((s) => s.getTask);
+  const getAgent = useOfficeStore((s) => s.getAgent);
   const selectTask = useUIStore((s) => s.selectTask);
   const selectAgent = useUIStore((s) => s.selectAgent);
+  const setActiveModule = useUIStore((s) => s.setActiveModule);
   const items = useDashboardStore((s) => s.calendarItems);
   const weekStart = useDashboardStore((s) => s.calendarWeekStart);
   const setWeekStart = useDashboardStore((s) => s.setCalendarWeekStart);
@@ -28,6 +30,7 @@ export function CalendarView() {
 
   const columns = useMemo(() => getWeekColumns(items, weekStart), [items, weekStart]);
   const planItems = useMemo(() => items.filter((i) => i.type === 'plan' || (i.stages && i.stages.length > 0)), [items]);
+  const today = new Date().toISOString().slice(0, 10);
 
   function handleComplete(itemId: string, taskId: string | null, title: string) {
     markComplete(itemId);
@@ -59,15 +62,15 @@ export function CalendarView() {
   return (
     <div className="workbench-page">
       <WorkbenchHeader
-        title="Calendar / Plan"
+        title="日程 / 计划"
         subtitle={weekLabel}
         actions={
           <div className="flex gap-1">
             <button className="cyber-btn text-xs" onClick={() => setWeekStart(shiftWeekStart(weekStart, -1))}>
-              Prev
+              上一周
             </button>
             <button className="cyber-btn text-xs" onClick={() => setWeekStart(shiftWeekStart(weekStart, 1))}>
-              Next
+              下一周
             </button>
           </div>
         }
@@ -76,13 +79,16 @@ export function CalendarView() {
       {/* Week grid */}
       <div className="grid grid-cols-7 gap-2 mb-6">
         {columns.map((col, ci) => {
-          const isToday = col.date === new Date().toISOString().slice(0, 10);
+          const isToday = col.date === today;
           return (
             <div key={col.date} className="min-w-0">
-              <div className={`text-xs font-medium mb-2 text-center ${isToday ? 'text-cyber-accent' : 'text-gray-500'}`}>
-                {DAY_LABELS[ci]}
+              <div className={`text-xs font-medium mb-2 text-center py-1 rounded ${isToday ? 'text-cyber-accent border border-cyber-accent/50 bg-cyber-accent/10' : 'text-gray-500'}`}>
+                {WEEKDAY_LABELS[ci]}
                 <br />
-                <span className="text-[10px]">{col.date.slice(5)}</span>
+                <span className="text-[10px]">
+                  {col.date.slice(5)}
+                  {isToday && <span className="ml-1 text-cyber-accent">今天</span>}
+                </span>
               </div>
               <div className="space-y-1.5">
                 {col.items.map((item) => {
@@ -97,6 +103,7 @@ export function CalendarView() {
                       }`}
                       onClick={() => {
                         if (task?.assignedAgentId) selectAgent(task.assignedAgentId);
+                        else if (item.agentId) selectAgent(item.agentId);
                         else if (item.taskId) selectTask(item.taskId);
                       }}
                     >
@@ -110,6 +117,18 @@ export function CalendarView() {
                         </span>
                       </div>
                       <div className="text-[10px] text-gray-500 mt-0.5">{item.time}</div>
+                      {item.taskId && (
+                        <button
+                          className="cyber-btn text-[10px] mt-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveModule('tasks');
+                            selectTask(item.taskId!);
+                          }}
+                        >
+                          关联任务
+                        </button>
+                      )}
                     </div>
                   );
                 })}
@@ -125,11 +144,12 @@ export function CalendarView() {
       {/* Learning plan panel */}
       {planItems.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-cyber-accent mb-3">Learning Plans & Staged Tasks</h3>
+          <h3 className="text-sm font-medium text-cyber-accent mb-3">学习计划 & 阶段任务</h3>
           <div className="space-y-3">
             {planItems.map((item) => {
               const hasStages = item.stages && item.stages.length > 0;
-              const allStagesDone = hasStages && item.stages!.every((s) => s.done);
+              const stages = item.stages ?? [];
+              const doneCount = stages.filter((s) => s.done).length;
 
               return (
                 <div
@@ -150,7 +170,7 @@ export function CalendarView() {
                   {item.progress !== undefined && (
                     <div className="mb-2">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-[10px] text-gray-500">Progress</span>
+                        <span className="text-[10px] text-gray-500">计划进度</span>
                         <span className="text-[10px] text-gray-400">{Math.round(item.progress * 100)}%</span>
                       </div>
                       <div className="h-1 rounded-full bg-cyber-dark overflow-hidden">
@@ -162,12 +182,18 @@ export function CalendarView() {
                           }}
                         />
                       </div>
+                      {hasStages && (
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="text-[10px] text-gray-500">实际完成</span>
+                          <span className="text-[10px] text-gray-400">{doneCount}/{stages.length}</span>
+                        </div>
+                      )}
                     </div>
                   )}
 
                   {hasStages && (
                     <div className="space-y-1">
-                      {item.stages!.map((stage, si) => (
+                      {stages.map((stage, si) => (
                         <div
                           key={si}
                           className="flex items-center gap-2 text-xs cursor-pointer hover:text-white transition-colors"
@@ -202,7 +228,7 @@ export function CalendarView() {
                         handleComplete(item.id, item.taskId, item.title);
                       }}
                     >
-                      Mark Complete
+                      标记完成
                     </button>
                   )}
                 </div>
@@ -213,7 +239,7 @@ export function CalendarView() {
       )}
 
       {items.length === 0 && (
-        <div className="text-gray-600 text-sm text-center py-12">No schedule items</div>
+        <div className="text-gray-600 text-sm text-center py-12">暂无日程项目</div>
       )}
     </div>
   );

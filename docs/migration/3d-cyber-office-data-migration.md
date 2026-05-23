@@ -64,6 +64,27 @@ After refresh:
 11. Run `Commander Demo` or `Approved Delivery`.
 12. Confirm EventFeed and Commander summary update.
 
+## 迁移后健康检查
+
+导入迁移包后，请检查 Migration 页面的"迁移健康检查"：
+
+- `可以迁移`：核心状态完整。
+- `可以迁移，但有缺失项`：缺少部分状态，系统会使用默认值。
+- `已阻止迁移`：迁移包中有敏感凭据或 schema 错误。
+
+## 凭据不迁移
+
+迁移包不会导出：
+
+- API key
+- token
+- password
+- authorization header
+- cookie
+- 外部 Runtime 凭据
+
+如果你启用了真实 AI Runtime，请在新电脑上重新配置外部 Runtime，不要把凭据粘进浏览器 localStorage。
+
 ## Runtime Reconnection
 
 Runtime credentials are never exported. On the target computer:

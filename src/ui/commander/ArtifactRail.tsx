@@ -1,10 +1,12 @@
 import { useCommanderStore } from '@/store/commanderStore';
+import { useUIStore } from '@/store/uiStore';
+import { useDashboardStore } from '@/store/dashboardStore';
 
 const kindLabels: Record<string, string> = {
-  notes: 'Notes',
-  patch: 'Patch',
-  review: 'Review',
-  report: 'Report',
+  notes: '笔记',
+  patch: '补丁',
+  review: '审查',
+  report: '报告',
 };
 
 export function ArtifactRail() {
@@ -28,14 +30,14 @@ export function ArtifactRail() {
   return (
     <section className="commander-section">
       <header className="commander-section-title">
-        <span>Artifacts</span>
-        <span className="commander-pill">{items.length} items</span>
+        <span>产物</span>
+        <span className="commander-pill">{items.length} 项</span>
       </header>
       <div className="artifact-rail">
         {items.map((artifact) => {
           const worker = workers.find((w) => w.id === artifact.createdByWorkerId);
           return (
-            <div key={artifact.id} className="artifact-card">
+            <div key={artifact.id} className={`artifact-card ${mission ? 'artifact-card-delivered' : ''}`}>
               <div className="artifact-card-head">
                 <strong>{artifact.title}</strong>
                 <span className="artifact-kind">{kindLabels[artifact.kind] ?? artifact.kind}</span>
@@ -45,6 +47,15 @@ export function ArtifactRail() {
               <div className="artifact-meta">
                 <span>{worker?.name ?? artifact.createdByWorkerId}</span>
               </div>
+              <button
+                className="cyber-btn text-xs mt-2"
+                onClick={() => {
+                  useUIStore.getState().setActiveModule('files');
+                  useDashboardStore.getState().setSelectedArtifactId(artifact.id);
+                }}
+              >
+                查看文件
+              </button>
             </div>
           );
         })}

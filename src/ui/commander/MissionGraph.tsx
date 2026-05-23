@@ -3,14 +3,14 @@ import type { CommanderMission } from '@/core/types';
 import { useUIStore } from '@/store/uiStore';
 
 const statusLabels: Record<string, string> = {
-  planned: 'Planned',
-  assigned: 'Assigned',
-  running: 'Running',
-  waiting_input: 'Needs input',
-  approval_required: 'Approval',
-  blocked: 'Blocked',
-  failed: 'Failed',
-  completed: 'Done',
+  planned: '已规划',
+  assigned: '已分配',
+  running: '运行中',
+  waiting_input: '等待输入',
+  approval_required: '等待审批',
+  blocked: '阻塞',
+  failed: '失败',
+  completed: '已完成',
 };
 
 export function MissionGraph({ mission }: { mission: CommanderMission }) {
@@ -20,10 +20,10 @@ export function MissionGraph({ mission }: { mission: CommanderMission }) {
   return (
     <section className="commander-section">
       <header className="commander-section-title">
-        <span>{mission.title}</span>
-        <span className="commander-pill">{mission.status}</span>
+        <span>任务图</span>
+        <span className="commander-pill">{mission.title}</span>
       </header>
-      <div className="mission-graph">
+      <div className="mission-graph mission-graph-linked">
         {buildMissionLanes(mission).map((lane, laneIndex) => (
           <div key={laneIndex} className="mission-lane">
             {lane.map((task) => (
@@ -31,6 +31,7 @@ export function MissionGraph({ mission }: { mission: CommanderMission }) {
                 key={task.id}
                 type="button"
                 className={`mission-node mission-node-${task.status}`}
+                data-status={task.status}
                 onClick={() => {
                   selectMissionTask(task.id);
                   selectTask(task.officeTaskId);

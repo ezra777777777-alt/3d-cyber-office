@@ -4,6 +4,11 @@
 
 The 3D Cyber Office does not talk directly to arbitrary agent runtimes from UI components. Runtime messages enter through a small adapter layer, are normalized into `OfficeEvent`, and then flow through the existing event bus.
 
+There are two parallel adapter layers:
+
+- **Runtime Adapter** (this document) — normalizes raw runtime messages (`source: 'runtime'`) from an external agent process
+- **Commander Adapter** (`source: 'ai_adapter'`) — plans missions and executes worker tasks through AI planners. Documented in [real-ai-commander-adapter.md](./real-ai-commander-adapter.md)
+
 ## Modes
 
 | Mode | Meaning |

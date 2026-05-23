@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { defaultLayout } from '@/data/defaultLayout';
 import { countSemanticOfficeLandmarks, getCommanderDesk, getNamedSceneZones } from './sceneTesting';
+import { getCommanderWorkerDeskTargets } from './commanderVisualTesting';
 
 describe('office scene metadata', () => {
   it('exposes the named zones required by the office overview', () => {
@@ -33,6 +34,10 @@ describe('office scene metadata', () => {
       expect(zone.label.length).toBeGreaterThan(0);
       expect(zone.subtitle.length).toBeGreaterThan(0);
     }
+  });
+
+  it('keeps Commander visually connected to the worker pod area', () => {
+    expect(getCommanderWorkerDeskTargets(defaultLayout).length).toBeGreaterThanOrEqual(3);
   });
 
   it('keeps enough semantic landmarks for the overview camera', () => {

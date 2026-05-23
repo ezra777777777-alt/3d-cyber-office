@@ -213,23 +213,23 @@ export const demoReviews: ReviewCard[] = [
 export const demoRestCards: RestCard[] = [
   {
     id: 'rest-1',
-    title: 'Quiet Garden',
+    title: '静谧花园',
     kind: 'quiet_garden',
-    summary: 'Take a mindful pause. Ambient nature sounds and a gentle visual scene to reset focus between deep-work sessions.',
+    summary: '稍作休息，沉浸于自然白噪音与柔和视觉场景中，在深度工作间隙重置注意力。',
     accent: '#7ce3aa',
   },
   {
     id: 'rest-2',
-    title: 'Sound Space',
+    title: '声音空间',
     kind: 'sound_space',
-    summary: 'Curated lo-fi beats and ambient textures. Timer-based sessions with optional break reminders.',
+    summary: '精选 lo-fi 节拍与环境音效。支持定时播放与休息提醒。',
     accent: '#6ecbff',
   },
   {
     id: 'rest-3',
-    title: 'Daily Surprise',
+    title: '每日惊喜',
     kind: 'daily_surprise',
-    summary: 'A random tip, quote, or micro-challenge drawn from the agent workbench to spark curiosity.',
+    summary: '从 Agent 工作台随机抽取一条提示、名言或微挑战，激发好奇心。',
     accent: '#ffb84d',
   },
 ];

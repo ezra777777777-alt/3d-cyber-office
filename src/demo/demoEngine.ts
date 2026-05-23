@@ -1,23 +1,25 @@
 import type { OfficeEvent } from '@/core/types';
+import type { GuidedCameraShot, GuidedDemoCue, GuidedDemoStep } from './guidedDemoTypes';
 import { dispatch } from '@/core/event-bus';
 import { useUIStore } from '@/store/uiStore';
 
-interface ScheduledEvent {
+interface ScheduledStep {
   delayMs: number;
-  event: OfficeEvent;
+  event?: OfficeEvent;
+  cue?: GuidedDemoCue;
   fired: boolean;
 }
 
 let rafId: number | null = null;
-let scheduledEvents: ScheduledEvent[] = [];
+let scheduledSteps: ScheduledStep[] = [];
 let startTimestamp = 0;
 let pauseStartTime = 0;
 let pauseAccumulated = 0;
 
-export function startDemoEngine(scenarioSteps: { delayMs: number; event: OfficeEvent }[]) {
+export function startDemoEngine(scenarioSteps: GuidedDemoStep[] | { delayMs: number; event: OfficeEvent }[]) {
   stopDemoEngine();
 
-  scheduledEvents = scenarioSteps.map((s) => ({ ...s, fired: false }));
+  scheduledSteps = scenarioSteps.map((s) => ({ ...s, fired: false }));
   startTimestamp = performance.now();
   pauseStartTime = 0;
   pauseAccumulated = 0;
@@ -30,20 +32,47 @@ export function stopDemoEngine() {
     cancelAnimationFrame(rafId);
     rafId = null;
   }
-  scheduledEvents = [];
+  scheduledSteps = [];
   startTimestamp = 0;
   pauseStartTime = 0;
   pauseAccumulated = 0;
 }
 
 export function getPauseState(): { paused: boolean; progress: number } {
-  if (scheduledEvents.length === 0) return { paused: false, progress: 0 };
-  const elapsed = Date.now() - startTimestamp - pauseAccumulated;
-  const totalMs = Math.max(...scheduledEvents.map((s) => s.delayMs));
+  if (scheduledSteps.length === 0) return { paused: false, progress: 0 };
+  const now = pauseStartTime > 0 ? pauseStartTime : performance.now();
+  const elapsed = now - startTimestamp - pauseAccumulated;
+  const totalMs = Math.max(...scheduledSteps.map((s) => s.delayMs));
   return {
     paused: pauseStartTime > 0,
     progress: Math.min(elapsed / totalMs, 1),
   };
+}
+
+function applyGuidedCue(cue: GuidedDemoCue): void {
+  const ui = useUIStore.getState();
+  if (cue.kind === 'camera') {
+    ui.setGuidedCameraShot(cue.payload.shot as GuidedCameraShot);
+  }
+  if (cue.kind === 'narration') {
+    ui.setGuidedNarration(String(cue.payload.title ?? ''), String(cue.payload.body ?? ''));
+  }
+  if (cue.kind === 'module') {
+    ui.setActiveModule(String(cue.payload.module ?? 'office'));
+  }
+  if (cue.kind === 'select_task') {
+    ui.selectTask(String(cue.payload.taskId ?? ''));
+  }
+  if (cue.kind === 'select_agent') {
+    ui.selectAgent(String(cue.payload.agentId ?? ''));
+  }
+  if (cue.kind === 'commander_open') {
+    ui.setCommanderOpen(Boolean(cue.payload.open));
+  }
+  if (cue.kind === 'progress') {
+    const progress = Number(cue.payload.progress ?? 0);
+    ui.setGuidedProgress(Math.max(0, Math.min(1, progress)));
+  }
 }
 
 function tick() {
@@ -51,7 +80,8 @@ function tick() {
 
   if (!uiState.demoRunning) {
     rafId = null;
-    scheduledEvents = [];
+    scheduledSteps = [];
+    useUIStore.getState().clearGuidedDemo();
     return;
   }
 
@@ -70,17 +100,20 @@ function tick() {
 
   const elapsed = performance.now() - startTimestamp - pauseAccumulated;
 
-  for (const se of scheduledEvents) {
-    if (!se.fired && elapsed >= se.delayMs) {
-      se.fired = true;
-      dispatch(se.event);
+  for (const step of scheduledSteps) {
+    if (!step.fired && elapsed >= step.delayMs) {
+      step.fired = true;
+      if (step.event) dispatch(step.event);
+      if (step.cue) applyGuidedCue(step.cue);
     }
   }
 
-  if (scheduledEvents.every((e) => e.fired)) {
+  if (scheduledSteps.every((step) => step.fired)) {
     rafId = null;
-    // Let the React effect pick this up on next frame
-    setTimeout(() => useUIStore.getState().setDemoRunning(false), 0);
+    setTimeout(() => {
+      const ui = useUIStore.getState();
+      ui.setDemoRunning(false);
+    }, 0);
     return;
   }
 

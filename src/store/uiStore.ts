@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { GuidedCameraShot } from '@/demo/guidedDemoTypes';
 
 interface UIState {
   selectedAgentId: string | null;
@@ -10,6 +11,10 @@ interface UIState {
   cameraFocus: [number, number, number] | null;
   commanderOpen: boolean;
   selectedMissionTaskId: string | null;
+  guidedDemoTitle: string | null;
+  guidedDemoBody: string | null;
+  guidedDemoProgress: number;
+  guidedCameraShot: GuidedCameraShot | null;
 
   selectAgent: (id: string | null) => void;
   selectTask: (id: string | null) => void;
@@ -20,6 +25,10 @@ interface UIState {
   setCommanderOpen: (open: boolean) => void;
   selectMissionTask: (taskId: string | null) => void;
   clearSelection: () => void;
+  setGuidedNarration: (title: string | null, body: string | null) => void;
+  setGuidedProgress: (progress: number) => void;
+  setGuidedCameraShot: (shot: GuidedCameraShot | null) => void;
+  clearGuidedDemo: () => void;
 }
 
 export const useUIStore = create<UIState>()(
@@ -33,6 +42,10 @@ export const useUIStore = create<UIState>()(
       cameraFocus: null,
       commanderOpen: true,
       selectedMissionTaskId: null,
+      guidedDemoTitle: null,
+      guidedDemoBody: null,
+      guidedDemoProgress: 0,
+      guidedCameraShot: null,
 
       selectAgent: (id) =>
         set({ selectedAgentId: id, selectedTaskId: null }),
@@ -45,7 +58,17 @@ export const useUIStore = create<UIState>()(
       setCommanderOpen: (commanderOpen) => set({ commanderOpen }),
       selectMissionTask: (selectedMissionTaskId) => set({ selectedMissionTaskId }),
       clearSelection: () =>
-        set({ selectedAgentId: null, selectedTaskId: null, cameraFocus: null }),
+        set({ selectedAgentId: null, selectedTaskId: null }),
+      setGuidedNarration: (guidedDemoTitle, guidedDemoBody) => set({ guidedDemoTitle, guidedDemoBody }),
+      setGuidedProgress: (guidedDemoProgress) => set({ guidedDemoProgress }),
+      setGuidedCameraShot: (guidedCameraShot) => set({ guidedCameraShot }),
+      clearGuidedDemo: () =>
+        set({
+          guidedDemoTitle: null,
+          guidedDemoBody: null,
+          guidedDemoProgress: 0,
+          guidedCameraShot: null,
+        }),
     }),
     {
       name: 'cyber-office-ui',

@@ -1,5 +1,6 @@
 import { useOfficeStore } from '@/store/officeStore';
 import { useRuntimeStore } from '@/store/runtimeStore';
+import { labelForRuntimeMode, labelForRuntimeStatus } from '@/i18n/zh';
 
 export function StatusBar() {
   const tasks = useOfficeStore((s) => s.getAllTasks());
@@ -15,11 +16,11 @@ export function StatusBar() {
   const activeAgents = agents.filter((a) => a.status === 'working').length;
 
   const items = [
-    { label: 'Tasks', value: total, color: '#e0e0f0' },
-    { label: 'Running', value: running, color: '#00f0ff' },
-    { label: 'Waiting', value: waitingInput, color: '#f0a500' },
-    { label: 'Failed', value: failed, color: failed > 0 ? '#ff3366' : '#666688' },
-    { label: 'Active', value: activeAgents, color: '#00e676' },
+    { label: '任务', value: total, color: '#e0e0f0' },
+    { label: '运行中', value: running, color: '#00f0ff' },
+    { label: '等待中', value: waitingInput, color: '#f0a500' },
+    { label: '失败', value: failed, color: failed > 0 ? '#ff3366' : '#666688' },
+    { label: '活跃', value: activeAgents, color: '#00e676' },
   ];
 
   return (
@@ -33,10 +34,10 @@ export function StatusBar() {
         </div>
       ))}
       <div className="flex items-center gap-1.5 status-bar-item ml-auto">
-        <span className="text-gray-500 status-bar-text">Runtime: {runtimeMode}/{runtimeStatus}</span>
+        <span className="text-gray-500 status-bar-text">运行时：{labelForRuntimeMode(runtimeMode)} / {labelForRuntimeStatus(runtimeStatus)}</span>
         {lastHeartbeatAt && (
           <span className="status-bar-text text-gray-500">
-            HB: {new Date(lastHeartbeatAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            心跳：{new Date(lastHeartbeatAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
           </span>
         )}
       </div>

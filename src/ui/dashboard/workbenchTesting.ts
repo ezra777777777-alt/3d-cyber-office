@@ -20,6 +20,10 @@ export interface EventRowSearchItem {
   type: string;
   message: string;
   level: EventRowLevel;
+  taskId?: string | null;
+  agentId?: string | null;
+  artifactId?: string | null;
+  source?: string | null;
 }
 
 export function getWeekColumns(items: CalendarItem[], weekStartDate: string): CalendarDayColumn[] {

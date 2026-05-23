@@ -1,4 +1,5 @@
 import { useRuntimeStore } from '@/store/runtimeStore';
+import { labelForRuntimeMode, labelForRuntimeStatus } from '@/i18n/zh';
 
 const MODES = ['demo', 'mock', 'connected', 'offline'] as const;
 
@@ -10,7 +11,7 @@ export function RuntimeModeSwitch() {
 
   return (
     <div className="runtime-mode-switch">
-      <span className="text-gray-400 text-xs font-medium">Runtime</span>
+      <span className="text-gray-400 text-xs font-medium">运行时</span>
       {MODES.map((nextMode) => (
         <button
           key={nextMode}
@@ -21,11 +22,11 @@ export function RuntimeModeSwitch() {
             setMode(nextMode);
           }}
         >
-          {nextMode}
+          {labelForRuntimeMode(nextMode)}
         </button>
       ))}
       <span className="text-xs font-medium" style={{ color: status === 'connected' ? '#00e676' : status === 'error' ? '#ff3366' : '#8888aa' }}>
-        {status}
+        {labelForRuntimeStatus(status)}
       </span>
     </div>
   );

@@ -1,17 +1,18 @@
 import { useUIStore } from '@/store/uiStore';
+import { moduleLabels, moduleShortLabels, type ModuleId } from '@/i18n/zh';
 
-const MODULES = [
-  { id: 'office', label: 'Office' },
-  { id: 'calendar', label: 'Calendar' },
-  { id: 'tasks', label: 'Tasks' },
-  { id: 'logs', label: 'Logs' },
-  { id: 'files', label: 'Files' },
-  { id: 'cronjobs', label: 'Cron Jobs' },
-  { id: 'gateway', label: 'Gateway' },
-  { id: 'review', label: 'Review' },
-  { id: 'rest', label: 'Rest' },
-  { id: 'migration', label: 'Migration' },
-] as const;
+const MODULES: { id: ModuleId }[] = [
+  { id: 'office' },
+  { id: 'calendar' },
+  { id: 'tasks' },
+  { id: 'logs' },
+  { id: 'files' },
+  { id: 'cronjobs' },
+  { id: 'gateway' },
+  { id: 'review' },
+  { id: 'rest' },
+  { id: 'migration' },
+];
 
 export function Navigation() {
   const activeModule = useUIStore((s) => s.activeModule);
@@ -20,7 +21,7 @@ export function Navigation() {
   return (
     <nav className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 border-b border-cyber-border bg-cyber-panel/80 backdrop-blur-sm flex-wrap">
       <div className="text-cyber-accent font-semibold text-xs sm:text-sm mr-2 sm:mr-4 tracking-wider whitespace-nowrap">
-        CYBER OFFICE
+        3D 赛博办公室
       </div>
       {MODULES.map((mod) => (
         <button
@@ -29,10 +30,12 @@ export function Navigation() {
           className={`px-1.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs rounded transition-colors whitespace-nowrap ${
             activeModule === mod.id
               ? 'bg-cyber-accent/15 text-cyber-accent border border-cyber-accent/30'
-              : 'text-gray-400 hover:text-white hover:bg-white/5'
+              : 'text-gray-300 hover:text-white hover:bg-white/5'
           }`}
+          title={moduleLabels[mod.id]}
         >
-          {mod.label}
+          <span className="sm:hidden">{moduleShortLabels[mod.id]}</span>
+          <span className="hidden sm:inline">{moduleLabels[mod.id]}</span>
         </button>
       ))}
     </nav>

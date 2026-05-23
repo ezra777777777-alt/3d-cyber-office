@@ -10,6 +10,7 @@ import type {
   OfficeEvent,
   WorkerProfile,
 } from '@/core/types';
+import type { CommanderAdapterMode, CommanderAdapterStatus } from '@/ai/commanderAdapterTypes';
 import { applyApprovalDecision } from '@/commander/commanderTesting';
 import { createDemoMission, demoArtifacts, demoWorkers } from '@/data/demoCommander';
 
@@ -26,6 +27,9 @@ interface CommanderState {
   approvals: Record<string, ApprovalRequest>;
   artifacts: Record<string, Artifact>;
   draft: CommanderDraft;
+  adapterMode: CommanderAdapterMode;
+  adapterStatus: CommanderAdapterStatus;
+  adapterError: string | null;
   setDraft: (patch: Partial<CommanderDraft>) => void;
   createMissionFromDraft: () => CommanderMission | null;
   selectMission: (missionId: string | null) => void;
@@ -37,12 +41,15 @@ interface CommanderState {
   addArtifact: (artifact: Artifact) => void;
   ingestCommanderEvent: (event: OfficeEvent) => void;
   resetCommander: () => void;
+  setAdapterMode: (adapterMode: CommanderAdapterMode) => void;
+  setAdapterStatus: (adapterStatus: CommanderAdapterStatus) => void;
+  setAdapterError: (adapterError: string | null) => void;
 }
 
 const defaultDraft: CommanderDraft = {
-  goal: 'Replicate the cyber office Commander loop from the reference video.',
-  materialNote: 'Use the reviewed local video and current requirement documents.',
-  constraintsText: 'Stay in Demo mode\nShow approvals before write actions\nLink artifacts to worker tasks',
+  goal: '复刻参考视频里的 3D 赛博办公室 Commander 工作流。',
+  materialNote: '使用已整理的视频需求文档、当前项目代码和本地演示数据。',
+  constraintsText: '保持演示模式可运行\n写入文件前需要审批\n产物必须关联到 Worker 任务',
 };
 
 function splitConstraints(value: string): string[] {
@@ -60,12 +67,12 @@ function statefulApprovalFromEvent(event: OfficeEvent): ApprovalRequest | null {
     missionId: event.missionId,
     taskId: String(event.payload.missionTaskId),
     officeTaskId: event.taskId,
-    requestedByWorkerId: 'worker-builder',
-    action: 'write workspace files',
+    requestedByWorkerId: String(event.payload.requestedByWorkerId ?? 'worker-builder'),
+    action: String(event.payload.action ?? 'unknown action'),
     reason: String(event.payload.reason ?? 'Workspace write request'),
-    target: 'src/ui/commander',
-    impact: 'Create local Commander workflow components.',
-    risk: 'medium',
+    target: String(event.payload.target ?? 'unknown target'),
+    impact: String(event.payload.impact ?? 'Unknown impact.'),
+    risk: (event.payload.risk as ApprovalRequest['risk']) ?? 'medium',
     status: 'pending',
     requestedAt: event.occurredAt,
     resolvedAt: null,
@@ -101,6 +108,9 @@ export const useCommanderStore = create<CommanderState>()(
       approvals: {},
       artifacts: Object.fromEntries(demoArtifacts.map((artifact) => [artifact.id, artifact])),
       draft: defaultDraft,
+      adapterMode: 'demo',
+      adapterStatus: 'idle',
+      adapterError: null,
       setDraft: (patch) => set((state) => ({ draft: { ...state.draft, ...patch } })),
       createMissionFromDraft: () => {
         const { draft } = get();
@@ -260,6 +270,9 @@ export const useCommanderStore = create<CommanderState>()(
           if (artifact) get().addArtifact(artifact);
         }
       },
+      setAdapterMode: (adapterMode) => set({ adapterMode }),
+      setAdapterStatus: (adapterStatus) => set({ adapterStatus }),
+      setAdapterError: (adapterError) => set({ adapterError }),
       resetCommander: () =>
         set({
           missions: {},
@@ -267,6 +280,9 @@ export const useCommanderStore = create<CommanderState>()(
           approvals: {},
           artifacts: Object.fromEntries(demoArtifacts.map((artifact) => [artifact.id, artifact])),
           draft: defaultDraft,
+          adapterMode: 'demo',
+          adapterStatus: 'idle',
+          adapterError: null,
         }),
     }),
     {
@@ -277,6 +293,7 @@ export const useCommanderStore = create<CommanderState>()(
         approvals: state.approvals,
         artifacts: state.artifacts,
         draft: state.draft,
+        adapterMode: state.adapterMode,
       }),
     },
   ),

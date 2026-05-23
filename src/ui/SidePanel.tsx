@@ -2,6 +2,7 @@ import { useUIStore } from '@/store/uiStore';
 import { useOfficeStore } from '@/store/officeStore';
 import { useEventStore } from '@/store/eventStore';
 import { ROLE_LABELS } from '@/data/defaultLayout';
+import { labelForAgentStatus, labelForTaskStatus } from '@/i18n/zh';
 
 const STATUS_COLORS: Record<string, string> = {
   idle: '#666688',
@@ -58,20 +59,20 @@ export function SidePanel() {
       {agent && (
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className="text-gray-500">Role</span>
+            <span className="text-gray-500">职责</span>
             <span className="text-white">{ROLE_LABELS[agent.role] || agent.role}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-500">Status</span>
-            <span style={{ color: STATUS_COLORS[agent.status] }}>{agent.status.toUpperCase()}</span>
+            <span className="text-gray-500">状态</span>
+            <span style={{ color: STATUS_COLORS[agent.status] }}>{labelForAgentStatus(agent.status)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-500">Desk</span>
+            <span className="text-gray-500">工位</span>
             <span className="text-white">{agent.deskId}</span>
           </div>
           {agent.lastActiveAt && (
             <div className="flex justify-between">
-              <span className="text-gray-500">Last Active</span>
+              <span className="text-gray-500">上次活跃</span>
               <span className="text-gray-400">{formatTime(agent.lastActiveAt)}</span>
             </div>
           )}
@@ -81,11 +82,11 @@ export function SidePanel() {
       {/* Task info */}
       {task && (
         <div className="space-y-2 border-t border-cyber-border pt-2">
-          <div className="text-gray-400 font-medium">Current Task</div>
+          <div className="text-gray-400 font-medium">当前任务</div>
           <div className="text-white text-sm font-medium">{task.title}</div>
           <div className="flex justify-between">
-            <span className="text-gray-500">Status</span>
-            <span style={{ color: TASK_STATUS_COLORS[task.status] }}>{task.status.toUpperCase()}</span>
+            <span className="text-gray-500">状态</span>
+            <span style={{ color: TASK_STATUS_COLORS[task.status] }}>{labelForTaskStatus(task.status)}</span>
           </div>
           {task.summary && <div className="text-gray-400">{task.summary}</div>}
           {task.outputSummary && (
@@ -96,8 +97,8 @@ export function SidePanel() {
           )}
           {recentEvents.some((e) => e.source === 'runtime') && (
             <div className="flex justify-between border-t border-cyber-border pt-2">
-              <span className="text-gray-500">Source</span>
-              <span className="text-[#22c55e] font-mono text-[10px]">RUNTIME</span>
+              <span className="text-gray-500">来源</span>
+              <span className="text-[#22c55e] font-mono text-[10px]">运行时</span>
             </div>
           )}
         </div>
@@ -106,7 +107,7 @@ export function SidePanel() {
       {/* Event feed */}
       {recentEvents.length > 0 && (
         <div className="border-t border-cyber-border pt-2">
-          <div className="text-gray-400 font-medium mb-2">Recent Events</div>
+          <div className="text-gray-400 font-medium mb-2">最近事件</div>
           <div className="space-y-1.5 max-h-48 overflow-y-auto">
             {recentEvents.map((evt) => (
               <div key={evt.id} className="flex gap-2 items-start">

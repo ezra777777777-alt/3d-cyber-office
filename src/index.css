@@ -17,7 +17,25 @@
   body {
     background: #0a0a1a;
     color: #e0e0f0;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', 'WenQuanYi Micro Hei', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  }
+
+  /* Chinese text readability: ensure CJK characters get enough size */
+  .workbench-page,
+  .commander-dock,
+  .cyber-panel {
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+
+  /* Keep monospace for code, logs, and raw data */
+  .font-mono,
+  pre,
+  code,
+  .migration-textarea,
+  .runtime-event-row pre,
+  textarea {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace !important;
   }
 
   ::-webkit-scrollbar {
@@ -88,6 +106,13 @@
     }
     .side-panel {
       @apply w-56 max-h-[50vh];
+    }
+    /* Chinese text needs slightly more space at small sizes */
+    .workbench-header h2 {
+      @apply text-base;
+    }
+    .cyber-btn {
+      @apply text-[10px] px-2 py-1;
     }
   }
 
@@ -248,6 +273,59 @@
     background: rgb(0 240 255 / 0.25);
   }
 
+  /* Commander hero header */
+  .commander-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem;
+    border: 1px solid rgba(255, 184, 77, 0.34);
+    background: linear-gradient(135deg, rgba(255, 184, 77, 0.16), rgba(0, 223, 246, 0.08));
+    border-radius: 0.5rem;
+  }
+
+  .commander-hero-kicker {
+    display: block;
+    color: #ffd27a;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+  }
+
+  .commander-hero h2 {
+    margin: 0.12rem 0 0;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .commander-hero-status {
+    max-width: 9rem;
+    color: #d7f7ff;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    text-align: right;
+  }
+
+  .commander-tone-approval .commander-hero {
+    border-color: rgba(240, 165, 0, 0.58);
+    box-shadow: 0 0 24px rgba(240, 165, 0, 0.16);
+  }
+
+  .commander-tone-blocked .commander-hero {
+    border-color: rgba(255, 51, 102, 0.55);
+    box-shadow: 0 0 24px rgba(255, 51, 102, 0.16);
+  }
+
+  .commander-tone-completed .commander-hero {
+    border-color: rgba(0, 230, 118, 0.5);
+    box-shadow: 0 0 24px rgba(0, 230, 118, 0.14);
+  }
+
+  .commander-intake {
+    border-color: rgba(255, 184, 77, 0.28);
+  }
+
   /* Mission graph */
   .mission-graph {
     display: flex;
@@ -322,6 +400,14 @@
   .mission-node-planned .mission-node-status { color: rgb(99 102 241); }
   .mission-node-assigned .mission-node-status { color: rgb(59 130 246); }
 
+  .mission-graph-linked .mission-node[data-status="approval_required"] {
+    border-color: rgba(240, 165, 0, 0.6);
+  }
+
+  .mission-graph-linked .mission-node[data-status="completed"] {
+    border-color: rgba(0, 230, 118, 0.45);
+  }
+
   /* Worker roster */
   .worker-roster {
     display: flex;
@@ -366,6 +452,15 @@
     margin-top: 0.3rem;
     color: rgb(0 240 255);
     font-size: 0.7rem;
+  }
+
+  .worker-card-working,
+  .worker-card-thinking {
+    border-color: rgba(0, 223, 246, 0.42);
+  }
+
+  .worker-card-blocked {
+    border-color: rgba(255, 51, 102, 0.46);
   }
 
   /* Approval inbox */
@@ -447,6 +542,11 @@
     background: rgb(239 68 68 / 0.25);
   }
 
+  .approval-card-pending {
+    border-color: rgba(240, 165, 0, 0.62);
+    background: rgba(240, 165, 0, 0.08);
+  }
+
   /* Artifact rail */
   .artifact-rail {
     display: flex;
@@ -460,6 +560,10 @@
     border-radius: 0.5rem;
     padding: 0.5rem;
     font-size: 0.72rem;
+  }
+
+  .artifact-card-delivered {
+    border-color: rgba(0, 230, 118, 0.34);
   }
 
   .artifact-card-head {
@@ -628,6 +732,116 @@
 
   @media (max-width: 760px) {
     .migration-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Guided demo HUD */
+  .guided-demo-hud {
+    width: min(22rem, calc(100vw - 1rem));
+    border: 1px solid rgba(255, 184, 77, 0.32);
+    background: rgba(7, 16, 32, 0.86);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+    padding: 0.85rem;
+    color: #eaf7ff;
+  }
+
+  .guided-demo-kicker {
+    color: #ffd27a;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.25rem;
+  }
+
+  .guided-demo-hud h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .guided-demo-hud p {
+    margin-top: 0.35rem;
+    color: #bcd8e8;
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .guided-demo-progress {
+    height: 0.28rem;
+    margin-top: 0.65rem;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .guided-demo-progress span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #ffb84d, #00dff6);
+  }
+
+  @media (max-width: 640px) {
+    .guided-demo-hud {
+      padding: 0.65rem;
+    }
+
+    .guided-demo-hud h2 {
+      font-size: 0.88rem;
+    }
+
+    .guided-demo-hud p {
+      font-size: 0.72rem;
+    }
+  }
+
+  .workbench-context-strip {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid rgb(0 240 255 / 0.22);
+    background: rgb(8 14 24 / 0.72);
+    border-radius: 0.5rem;
+    width: 100%;
+  }
+
+  .workbench-context-kicker {
+    display: block;
+    color: rgb(148 163 184);
+    font-size: 0.72rem;
+  }
+
+  .workbench-context-stats,
+  .workbench-context-links {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .workbench-linked-item {
+    border: 1px solid rgb(255 255 255 / 0.12);
+    background: rgb(255 255 255 / 0.05);
+    color: rgb(226 232 240);
+    border-radius: 0.4rem;
+    padding: 0.35rem 0.5rem;
+    text-align: left;
+  }
+
+  .workbench-linked-item small {
+    display: block;
+    color: rgb(148 163 184);
+    font-size: 0.65rem;
+  }
+
+  .workbench-empty-state {
+    padding: 1rem;
+    border: 1px dashed rgb(148 163 184 / 0.32);
+    border-radius: 0.5rem;
+    color: rgb(203 213 225);
+  }
+
+  @media (max-width: 640px) {
+    .workbench-context-strip {
       grid-template-columns: 1fr;
     }
   }

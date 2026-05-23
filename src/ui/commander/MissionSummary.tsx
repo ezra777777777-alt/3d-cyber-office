@@ -22,33 +22,33 @@ export function MissionSummary() {
   return (
     <section className="commander-section">
       <header className="commander-section-title">
-        <span>Mission status</span>
+        <span>任务总结</span>
         <span className={`commander-pill ${mission.status === 'completed' ? 'commander-pill-done' : ''}`}>
-          {mission.status}
+          {mission.status === 'completed' ? '已完成' : mission.status}
         </span>
       </header>
       {mission.summary && <p className="mission-summary-text">{mission.summary}</p>}
       <div className="mission-summary-grid">
         <div className="summary-stat">
           <span className="summary-stat-value">{summary.completedCount}/{summary.taskCount}</span>
-          <span className="summary-stat-label">Tasks done</span>
+          <span className="summary-stat-label">任务完成</span>
         </div>
         <div className="summary-stat">
           <span className="summary-stat-value">{summary.deliveredArtifactIds.length}</span>
-          <span className="summary-stat-label">Artifacts</span>
+          <span className="summary-stat-label">产物</span>
         </div>
         <div className="summary-stat">
           <span className="summary-stat-value">{summary.pendingApprovalCount}</span>
-          <span className="summary-stat-label">Pending approvals</span>
+          <span className="summary-stat-label">待审批</span>
         </div>
         <div className="summary-stat">
           <span className="summary-stat-value">{summary.blockedCount}</span>
-          <span className="summary-stat-label">Blocked</span>
+          <span className="summary-stat-label">阻塞</span>
         </div>
       </div>
       {mission.constraints.length > 0 && (
         <div className="mission-constraints">
-          <small>Constraints:</small>
+          <small>约束：</small>
           {mission.constraints.map((c, i) => (
             <span key={i} className="constraint-tag">{c}</span>
           ))}

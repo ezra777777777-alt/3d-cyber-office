@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { useUIStore } from '@/store/uiStore';
 import { useOfficeStore } from '@/store/officeStore';
 import { useEventStore } from '@/store/eventStore';
@@ -12,17 +12,19 @@ import { EventFeed } from './EventFeed';
 import { DemoControls } from './DemoControls';
 import { ResetCameraBtn } from './ResetCameraBtn';
 import { CommanderDock } from './commander/CommanderDock';
+import { GuidedDemoHud } from './GuidedDemoHud';
 import { RuntimeModeSwitch } from './runtime/RuntimeModeSwitch';
 import { OfficeScene } from '@/scene/OfficeScene';
-import { CalendarView } from './dashboard/CalendarView';
-import { LogsView } from './dashboard/LogsView';
-import { FilesView } from './dashboard/FilesView';
-import { CronJobsView } from './dashboard/CronJobsView';
-import { GatewayStatus } from './dashboard/GatewayStatus';
-import { DailyReview } from './dashboard/DailyReview';
-import { TasksView } from './dashboard/TasksView';
-import { RestView } from './dashboard/RestView';
-import { MigrationView } from './dashboard/MigrationView';
+
+const CalendarView = lazy(() => import('./dashboard/CalendarView').then((m) => ({ default: m.CalendarView })));
+const TasksView = lazy(() => import('./dashboard/TasksView').then((m) => ({ default: m.TasksView })));
+const LogsView = lazy(() => import('./dashboard/LogsView').then((m) => ({ default: m.LogsView })));
+const FilesView = lazy(() => import('./dashboard/FilesView').then((m) => ({ default: m.FilesView })));
+const CronJobsView = lazy(() => import('./dashboard/CronJobsView').then((m) => ({ default: m.CronJobsView })));
+const GatewayStatus = lazy(() => import('./dashboard/GatewayStatus').then((m) => ({ default: m.GatewayStatus })));
+const DailyReview = lazy(() => import('./dashboard/DailyReview').then((m) => ({ default: m.DailyReview })));
+const RestView = lazy(() => import('./dashboard/RestView').then((m) => ({ default: m.RestView })));
+const MigrationView = lazy(() => import('./dashboard/MigrationView').then((m) => ({ default: m.MigrationView })));
 import { stopDemoEngine } from '@/demo/demoEngine';
 import { dispatch } from '@/core/event-bus';
 import { createMockRuntimeAdapter } from '@/runtime/mockRuntimeAdapter';
@@ -238,42 +240,48 @@ export function AppShell() {
               <div className="flex-1 min-w-0">
                 <EventFeed />
               </div>
-              <div className="w-48 sm:w-48 flex-shrink-0 demo-controls">
-                <DemoControls />
-              </div>
             </div>
           </div>
         ) : (
           /* Workbench: SidePanel docks on the right (desktop), overlays on narrow screens */
           <div className="flex-1 flex min-h-0">
             <div className="flex-1 min-w-0 overflow-hidden">
-              {activeModule === 'calendar' ? (
-                <CalendarView />
-              ) : activeModule === 'tasks' ? (
-                <TasksView />
-              ) : activeModule === 'logs' ? (
-                <LogsView />
-              ) : activeModule === 'files' ? (
-                <FilesView />
-              ) : activeModule === 'cronjobs' ? (
-                <CronJobsView />
-              ) : activeModule === 'gateway' ? (
-                <GatewayStatus />
-              ) : activeModule === 'review' ? (
-                <DailyReview />
-              ) : activeModule === 'rest' ? (
-                <RestView />
-              ) : activeModule === 'migration' ? (
-                <MigrationView />
-              ) : (
-                <OfficeScene />
-              )}
+              <Suspense fallback={<div className="p-4 text-sm text-gray-400">正在加载工作台...</div>}>
+                {activeModule === 'calendar' ? (
+                  <CalendarView />
+                ) : activeModule === 'tasks' ? (
+                  <TasksView />
+                ) : activeModule === 'logs' ? (
+                  <LogsView />
+                ) : activeModule === 'files' ? (
+                  <FilesView />
+                ) : activeModule === 'cronjobs' ? (
+                  <CronJobsView />
+                ) : activeModule === 'gateway' ? (
+                  <GatewayStatus />
+                ) : activeModule === 'review' ? (
+                  <DailyReview />
+                ) : activeModule === 'rest' ? (
+                  <RestView />
+                ) : activeModule === 'migration' ? (
+                  <MigrationView />
+                ) : (
+                  <OfficeScene />
+                )}
+              </Suspense>
             </div>
             <div className="max-sm:absolute max-sm:right-0 max-sm:top-0 max-sm:z-30 max-sm:h-full max-sm:overflow-y-auto">
               <SidePanel />
             </div>
           </div>
         )}
+        {/* HUD and controls persist across module switches */}
+        <div className="absolute left-2 top-20 z-20 pointer-events-none max-w-[22rem]">
+          <GuidedDemoHud />
+        </div>
+        <div className="absolute bottom-2 right-2 z-30 pointer-events-auto">
+          <DemoControls />
+        </div>
       </div>
     </div>
   );

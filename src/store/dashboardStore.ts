@@ -11,6 +11,11 @@ interface DashboardPersistedState {
   taskStatusFilter: WorkbenchTask['status'] | 'all';
   taskSourceFilter: WorkbenchTask['source'] | 'all';
   restMuted: boolean;
+  selectedArtifactId: string | null;
+  selectedRuntimeDiagnosticId: string | null;
+  reviewScope: 'today' | 'mission' | 'runtime';
+  restMode: 'normal' | 'focus' | 'muted';
+  taskDependencyExpanded: Record<string, boolean>;
 }
 
 function loadFromStorage(): DashboardPersistedState | null {
@@ -27,6 +32,11 @@ function loadFromStorage(): DashboardPersistedState | null {
         taskStatusFilter: 'all',
         taskSourceFilter: 'all',
         restMuted: false,
+        selectedArtifactId: null,
+        selectedRuntimeDiagnosticId: null,
+        reviewScope: 'today',
+        restMode: 'normal',
+        taskDependencyExpanded: {},
       };
     }
     if (parsed && typeof parsed === 'object' && Array.isArray(parsed.calendarItems)) {
@@ -37,6 +47,11 @@ function loadFromStorage(): DashboardPersistedState | null {
         taskStatusFilter: parsed.taskStatusFilter ?? 'all',
         taskSourceFilter: parsed.taskSourceFilter ?? 'all',
         restMuted: parsed.restMuted ?? false,
+        selectedArtifactId: parsed.selectedArtifactId ?? null,
+        selectedRuntimeDiagnosticId: parsed.selectedRuntimeDiagnosticId ?? null,
+        reviewScope: parsed.reviewScope ?? 'today',
+        restMode: parsed.restMode ?? 'normal',
+        taskDependencyExpanded: parsed.taskDependencyExpanded ?? {},
       };
     }
   } catch { /* ignore */ }
@@ -64,6 +79,11 @@ interface DashboardState {
   taskStatusFilter: WorkbenchTask['status'] | 'all';
   taskSourceFilter: WorkbenchTask['source'] | 'all';
   restMuted: boolean;
+  taskDependencyExpanded: Record<string, boolean>;
+  selectedArtifactId: string | null;
+  selectedRuntimeDiagnosticId: string | null;
+  reviewScope: 'today' | 'mission' | 'runtime';
+  restMode: 'normal' | 'focus' | 'muted';
 
   getCalendarItems: () => CalendarItem[];
   toggleStage: (itemId: string, stageIdx: number) => void;
@@ -75,9 +95,14 @@ interface DashboardState {
   setTaskSourceFilter: (filter: WorkbenchTask['source'] | 'all') => void;
   toggleRestMuted: () => void;
   upsertRuntimeWorkbenchTask: (task: Partial<WorkbenchTask> & Pick<WorkbenchTask, 'id'>) => void;
+  setTaskDependencyExpanded: (taskId: string, expanded: boolean) => void;
+  setSelectedArtifactId: (artifactId: string | null) => void;
+  setSelectedRuntimeDiagnosticId: (diagnosticId: string | null) => void;
+  setReviewScope: (scope: 'today' | 'mission' | 'runtime') => void;
+  setRestMode: (mode: 'normal' | 'focus' | 'muted') => void;
 }
 
-function initState(): Pick<DashboardState, 'calendarItems' | 'workbenchTasks' | 'selectedFileId' | 'taskStatusFilter' | 'taskSourceFilter' | 'restMuted'> {
+function initState(): Pick<DashboardState, 'calendarItems' | 'workbenchTasks' | 'selectedFileId' | 'taskStatusFilter' | 'taskSourceFilter' | 'restMuted' | 'selectedArtifactId' | 'selectedRuntimeDiagnosticId' | 'reviewScope' | 'restMode' | 'taskDependencyExpanded'> {
   const stored = loadFromStorage();
   if (stored) {
     return {
@@ -87,6 +112,11 @@ function initState(): Pick<DashboardState, 'calendarItems' | 'workbenchTasks' | 
       taskStatusFilter: stored.taskStatusFilter,
       taskSourceFilter: stored.taskSourceFilter,
       restMuted: stored.restMuted,
+      selectedArtifactId: stored.selectedArtifactId,
+      selectedRuntimeDiagnosticId: stored.selectedRuntimeDiagnosticId,
+      reviewScope: stored.reviewScope,
+      restMode: stored.restMode,
+      taskDependencyExpanded: stored.taskDependencyExpanded,
     };
   }
   return {
@@ -96,6 +126,11 @@ function initState(): Pick<DashboardState, 'calendarItems' | 'workbenchTasks' | 
     taskStatusFilter: 'all',
     taskSourceFilter: 'all',
     restMuted: false,
+    selectedArtifactId: null,
+    selectedRuntimeDiagnosticId: null,
+    reviewScope: 'today',
+    restMode: 'normal',
+    taskDependencyExpanded: {},
   };
 }
 
@@ -159,6 +194,22 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
   toggleRestMuted: () => set((s) => ({ restMuted: !s.restMuted })),
 
+  setTaskDependencyExpanded: (taskId, expanded) =>
+    set((state) => ({
+      taskDependencyExpanded: {
+        ...state.taskDependencyExpanded,
+        [taskId]: expanded,
+      },
+    })),
+
+  setSelectedArtifactId: (selectedArtifactId) => set({ selectedArtifactId }),
+
+  setSelectedRuntimeDiagnosticId: (selectedRuntimeDiagnosticId) => set({ selectedRuntimeDiagnosticId }),
+
+  setReviewScope: (reviewScope) => set({ reviewScope }),
+
+  setRestMode: (restMode) => set({ restMode }),
+
   upsertRuntimeWorkbenchTask: (patch) =>
     set((state) => {
       const exists = state.workbenchTasks.find((current) => current.id === patch.id);
@@ -198,5 +249,10 @@ useDashboardStore.subscribe((state) => {
     taskStatusFilter: state.taskStatusFilter,
     taskSourceFilter: state.taskSourceFilter,
     restMuted: state.restMuted,
+    selectedArtifactId: state.selectedArtifactId,
+    selectedRuntimeDiagnosticId: state.selectedRuntimeDiagnosticId,
+    reviewScope: state.reviewScope,
+    restMode: state.restMode,
+    taskDependencyExpanded: state.taskDependencyExpanded,
   });
 });

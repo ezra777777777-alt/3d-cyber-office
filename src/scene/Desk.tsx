@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { useOfficeStore } from '@/store/officeStore';
 import { useUIStore } from '@/store/uiStore';
 import { Chair } from './Chair';
+import { brightOfficeTheme } from './sceneVisualTheme';
 
 interface DeskProps {
   deskId: string;
@@ -25,7 +26,7 @@ export function Desk({ deskId, position, rotation = 0, label, isCommander }: Des
   const isBlocked = task?.status === 'blocked' || task?.status === 'failed';
   const needsInput = task?.status === 'waiting_input';
 
-  const accentColor = isCommander ? '#ffb84d' : '#00f0ff';
+  const accentColor = isCommander ? brightOfficeTheme.commanderAccent : brightOfficeTheme.workerAccent;
   let screenColor = '#111122';
   let screenEmissive = '#111122';
   if (isActive) {
@@ -44,14 +45,14 @@ export function Desk({ deskId, position, rotation = 0, label, isCommander }: Des
       {/* Desk surface */}
       <mesh position={[0, 0.75, 0]} castShadow receiveShadow>
         <boxGeometry args={[2.4, 0.08, 1.2]} />
-        <meshStandardMaterial color="#3a3a4a" roughness={0.3} metalness={0.4} />
+        <meshStandardMaterial color={brightOfficeTheme.deskSurface} roughness={0.3} metalness={brightOfficeTheme.deskMetalness} />
       </mesh>
 
       {/* Desk legs — thicker at corners */}
       {[[-1.05, -0.5], [1.05, -0.5], [-1.05, 0.5], [1.05, 0.5]].map(([x, z], i) => (
         <mesh key={i} position={[x, 0.375, z]} castShadow>
           <boxGeometry args={[0.1, 0.75, 0.1]} />
-          <meshStandardMaterial color="#2a2a3a" roughness={0.3} metalness={0.7} />
+          <meshStandardMaterial color={brightOfficeTheme.deskLeg} roughness={0.3} metalness={0.7} />
         </mesh>
       ))}
 
@@ -64,19 +65,19 @@ export function Desk({ deskId, position, rotation = 0, label, isCommander }: Des
       {/* Monitor stand base */}
       <mesh position={[0, 0.83, -0.4]} castShadow>
         <boxGeometry args={[0.35, 0.06, 0.25]} />
-        <meshStandardMaterial color="#2a2a3a" roughness={0.2} metalness={0.8} />
+        <meshStandardMaterial color={brightOfficeTheme.deskLeg} roughness={0.2} metalness={0.8} />
       </mesh>
       {/* Monitor stand neck */}
       <mesh position={[0, 0.96, -0.38]}>
         <boxGeometry args={[0.08, 0.22, 0.06]} />
-        <meshStandardMaterial color="#2a2a3a" roughness={0.2} metalness={0.8} />
+        <meshStandardMaterial color={brightOfficeTheme.deskLeg} roughness={0.2} metalness={0.8} />
       </mesh>
 
       {/* Desktop props */}
       {/* Keyboard */}
       <mesh position={[0, 0.81, 0.18]} castShadow>
         <boxGeometry args={[0.5, 0.025, 0.16]} />
-        <meshStandardMaterial color="#2a2a35" roughness={0.6} />
+        <meshStandardMaterial color="#4a4a55" roughness={0.6} />
       </mesh>
       {/* Coffee mug */}
       <mesh position={[0.6, 0.81, -0.05]} castShadow>
@@ -96,6 +97,28 @@ export function Desk({ deskId, position, rotation = 0, label, isCommander }: Des
 
       {/* Chair */}
       <Chair />
+
+      {/* Commander top beacon */}
+      {isCommander && (
+        <mesh position={[0, 1.64, -0.38]}>
+          <boxGeometry args={[1.05, 0.05, 0.055]} />
+          <meshBasicMaterial color={brightOfficeTheme.commanderGlow} />
+        </mesh>
+      )}
+
+      {/* Commander warm side panels */}
+      {isCommander && (
+        <>
+          <mesh position={[-0.78, 1.2, -0.37]}>
+            <boxGeometry args={[0.05, 0.62, 0.07]} />
+            <meshBasicMaterial color={brightOfficeTheme.commanderAccent} />
+          </mesh>
+          <mesh position={[0.78, 1.2, -0.37]}>
+            <boxGeometry args={[0.05, 0.62, 0.07]} />
+            <meshBasicMaterial color={brightOfficeTheme.commanderAccent} />
+          </mesh>
+        </>
+      )}
 
       {/* Selection outline */}
       {isSelected && (

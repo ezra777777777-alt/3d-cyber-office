@@ -6,7 +6,7 @@ export function RuntimeEventInspector() {
 
   return (
     <section className="cyber-panel p-4">
-      <h3 className="text-sm font-medium text-white">Runtime Event Inspector</h3>
+      <h3 className="text-sm font-medium text-white">运行时事件检查器</h3>
       <div className="mt-3 grid gap-2">
         {rawEvents.slice(0, 8).map((event) => (
           <article key={event.runtimeEventId} className="runtime-event-row">
@@ -18,7 +18,7 @@ export function RuntimeEventInspector() {
           </article>
         ))}
         {rawEvents.length === 0 ? (
-          <p className="text-xs text-gray-500">No runtime events received yet.</p>
+          <p className="text-xs text-gray-500">尚未收到运行时事件。</p>
         ) : null}
       </div>
     </section>

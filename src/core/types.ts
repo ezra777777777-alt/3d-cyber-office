@@ -109,7 +109,7 @@ export interface OfficeEvent {
 }
 
 // ─── Dashboard ────────────────────────────────────────
-export type WorkbenchSource = 'demo' | 'local' | 'runtime' | 'cron' | 'google_tasks' | 'system' | 'user';
+export type WorkbenchSource = 'demo' | 'local' | 'runtime' | 'cron' | 'google_tasks' | 'system' | 'user' | 'ai_adapter';
 
 export interface CalendarItem {
   id: string;
@@ -140,6 +140,7 @@ export interface WorkbenchTask {
   dueLabel: string;
   priority: 'low' | 'medium' | 'high';
   summary: string;
+  dependencyIds?: string[];
 }
 
 export interface LogEntry {
@@ -239,7 +240,7 @@ export interface OfficeLayout {
 }
 
 // ─── Commander ───────────────────────────────────────
-export type RiskLevel = 'low' | 'medium' | 'high';
+export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 
 export type MissionStatus =
   | 'draft'

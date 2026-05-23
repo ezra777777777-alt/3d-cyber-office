@@ -1,0 +1,12 @@
+dist/
+.vite/
+node_modules/
+*.local
+.env
+.env.*
+!.env.example
+screenshots/
+qa-artifacts/
+playwright-report/
+test-results/
+*.log

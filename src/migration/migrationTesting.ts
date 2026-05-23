@@ -8,18 +8,25 @@ import {
   type MigrationStorageKey,
   type MigrationValidationResult,
 } from './migrationTypes';
+import { hasSecretLikeContent } from './migrationHealth';
 
 const LABELS: Record<MigrationStorageKey, string> = {
-  'cyber-office-ui': 'UI preferences',
-  'cyber-office-data': 'Office agents and tasks',
-  'cyber-office-dashboard': 'Workbench dashboard state',
-  'cyber-office-commander': 'Commander missions and artifacts',
+  'cyber-office-ui': 'UI 偏好设置',
+  'cyber-office-data': '办公室 Agent 与任务',
+  'cyber-office-dashboard': '工作台仪表盘状态',
+  'cyber-office-commander': 'Commander 任务与产物',
 };
 
 const SECRET_KEY_PATTERN = /token|secret|password|api[_-]?key|authorization|cookie/i;
 
 export function findSecretLikeKeys(storage: Record<string, unknown>): string[] {
-  return Object.keys(storage).filter((key) => SECRET_KEY_PATTERN.test(key));
+  const suspects = Object.keys(storage).filter((key) => SECRET_KEY_PATTERN.test(key));
+  for (const key of MIGRATION_STORAGE_KEYS) {
+    if (storage[key] !== undefined && storage[key] !== null && hasSecretLikeContent(storage[key])) {
+      suspects.push(`${key}（值含疑似凭据）`);
+    }
+  }
+  return suspects;
 }
 
 export function buildMigrationBundle(
@@ -99,9 +106,9 @@ export interface RestoreChecklistItem {
 export function getRestoreChecklistStatus(bundle: MigrationBundle): RestoreChecklistItem[] {
   const byKey = new Map<string, MigrationSection>(bundle.sections.map((section) => [section.key, section]));
   return [
-    { key: 'ui', label: 'UI preferences restored', ready: Boolean(byKey.get('cyber-office-ui')?.included) },
-    { key: 'office', label: 'Office Agents and Tasks restored', ready: Boolean(byKey.get('cyber-office-data')?.included) },
-    { key: 'dashboard', label: 'Workbench dashboard state restored', ready: Boolean(byKey.get('cyber-office-dashboard')?.included) },
-    { key: 'commander', label: 'Commander missions restored', ready: Boolean(byKey.get('cyber-office-commander')?.included) },
+    { key: 'ui', label: 'UI 偏好设置已恢复', ready: Boolean(byKey.get('cyber-office-ui')?.included) },
+    { key: 'office', label: '办公室 Agent 与任务已恢复', ready: Boolean(byKey.get('cyber-office-data')?.included) },
+    { key: 'dashboard', label: '工作台仪表盘状态已恢复', ready: Boolean(byKey.get('cyber-office-dashboard')?.included) },
+    { key: 'commander', label: 'Commander 任务已恢复', ready: Boolean(byKey.get('cyber-office-commander')?.included) },
   ];
 }

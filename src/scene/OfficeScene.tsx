@@ -14,6 +14,8 @@ import { PendingMarker, DoneMarker } from './ZoneMarkers';
 import { defaultLayout } from '@/data/defaultLayout';
 import { ZoneLabel } from './ZoneLabel';
 import { CommanderStation } from './CommanderStation';
+import { CommanderVisualLayer } from './CommanderVisualLayer';
+import { brightOfficeTheme } from './sceneVisualTheme';
 
 export function OfficeScene() {
   const desks = useOfficeStore((s) => s.desks);
@@ -24,15 +26,18 @@ export function OfficeScene() {
       <Canvas
         shadows
         gl={{ antialias: true, alpha: false }}
-        style={{ background: '#1e1e35' }}
         onClick={() => clearSelection()}
       >
+        <color attach="background" args={[brightOfficeTheme.background]} />
+        <fog attach="fog" args={[brightOfficeTheme.fog, brightOfficeTheme.fogNear, brightOfficeTheme.fogFar]} />
+
         <Lighting />
         <Floor />
         <Walls />
 
         {/* Zone labels and commander focal point */}
         <CommanderStation />
+        <CommanderVisualLayer />
         {defaultLayout.zones.map((zone) => (
           <ZoneLabel key={zone.id} zone={zone} />
         ))}
@@ -61,7 +66,6 @@ export function OfficeScene() {
         <DoneMarker />
 
         <CameraController />
-        <fog attach="fog" args={['#1e1e35', 22, 40]} />
       </Canvas>
     </div>
   );

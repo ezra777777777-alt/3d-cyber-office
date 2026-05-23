@@ -20,11 +20,11 @@ const ROLE_COLORS: Record<string, string> = {
 };
 
 const ROLE_BODY_COLORS: Record<string, string> = {
-  research: '#1e2e3e',
-  coding: '#1e2e1e',
-  writing: '#2e2a1e',
-  analysis: '#251e2e',
-  coordinator: '#1e1e22',
+  research: '#5a6a7a',
+  coding: '#5a6a5a',
+  writing: '#6a6a5a',
+  analysis: '#6a5a6a',
+  coordinator: '#6a6a6a',
 };
 
 export function AgentCharacter({ agentId, position, deskRotation = 0 }: AgentCharacterProps) {
@@ -48,6 +48,7 @@ export function AgentCharacter({ agentId, position, deskRotation = 0 }: AgentCha
   const isResting = status === 'resting';
   const roleColor = ROLE_COLORS[agent.role] || '#00f0ff';
   const bodyColor = ROLE_BODY_COLORS[agent.role] || '#1a1a2e';
+  const isCommander = agent.role === 'coordinator';
 
   // Posture offsets: sit for working/completed, stand otherwise
   const isSitting = isWorking || isCompleted;
@@ -94,7 +95,7 @@ export function AgentCharacter({ agentId, position, deskRotation = 0 }: AgentCha
   const legY = isSitting ? 0.15 : 0.2;
 
   return (
-    <group ref={groupRef} position={position} rotation={[0, deskRotation, 0]}>
+    <group ref={groupRef} position={position} rotation={[0, deskRotation, 0]} scale={isCommander ? 1.12 : 1}>
       <group ref={bodyRef} position={[0, bodyY, 0]}>
         {/* Torso */}
         <mesh position={[0, 0, 0]} castShadow>
@@ -106,7 +107,7 @@ export function AgentCharacter({ agentId, position, deskRotation = 0 }: AgentCha
         <group ref={headRef} position={[0, 0.35, 0]}>
           <mesh castShadow>
             <sphereGeometry args={[0.13, 16, 16]} />
-            <meshStandardMaterial color="#3a3a4a" roughness={0.4} />
+            <meshStandardMaterial color="#8a95a5" roughness={0.4} />
           </mesh>
           {/* Eyes */}
           <mesh position={[-0.04, 0.02, 0.11]}>
@@ -159,11 +160,11 @@ export function AgentCharacter({ agentId, position, deskRotation = 0 }: AgentCha
         <>
           <mesh position={[-0.07, legY, 0]} castShadow>
             <boxGeometry args={[0.11, legLength, 0.11]} />
-            <meshStandardMaterial color="#2a2a35" roughness={0.5} />
+            <meshStandardMaterial color="#7a7a88" roughness={0.5} />
           </mesh>
           <mesh position={[0.07, legY, 0]} castShadow>
             <boxGeometry args={[0.11, legLength, 0.11]} />
-            <meshStandardMaterial color="#2a2a35" roughness={0.5} />
+            <meshStandardMaterial color="#7a7a88" roughness={0.5} />
           </mesh>
         </>
       )}
@@ -173,11 +174,11 @@ export function AgentCharacter({ agentId, position, deskRotation = 0 }: AgentCha
         <>
           <mesh position={[-0.1, 0.15, 0.08]} rotation={[0.5, 0, 0]} castShadow>
             <boxGeometry args={[0.1, 0.2, 0.1]} />
-            <meshStandardMaterial color="#2a2a35" roughness={0.5} />
+            <meshStandardMaterial color="#7a7a88" roughness={0.5} />
           </mesh>
           <mesh position={[0.1, 0.15, 0.08]} rotation={[0.5, 0, 0]} castShadow>
             <boxGeometry args={[0.1, 0.2, 0.1]} />
-            <meshStandardMaterial color="#2a2a35" roughness={0.5} />
+            <meshStandardMaterial color="#7a7a88" roughness={0.5} />
           </mesh>
         </>
       )}

@@ -1,19 +1,19 @@
+import { brightOfficeTheme } from './sceneVisualTheme';
+
 interface WallsProps {
-  roomSize?: [number, number, number]; // width, height, depth
+  roomSize?: [number, number, number];
 }
 
-export function Walls({ roomSize = [20, 3.5, 14] }: WallsProps) {
+export function Walls({ roomSize = brightOfficeTheme.roomSize }: WallsProps) {
   const [w, h, d] = roomSize;
-  const thick = 0.15;
-  const wallColor = '#4a4a58';
-  const wallRoughness = 0.7;
+  const thick = brightOfficeTheme.wallThickness;
 
   return (
     <group>
       {/* Back wall — solid with window panels */}
       <mesh position={[0, h / 2, -d / 2]} receiveShadow>
         <boxGeometry args={[w, h, thick]} />
-        <meshStandardMaterial color={wallColor} roughness={wallRoughness} />
+        <meshStandardMaterial color={brightOfficeTheme.wall} roughness={0.5} />
       </mesh>
 
       {/* Window panels on back wall */}
@@ -21,13 +21,13 @@ export function Walls({ roomSize = [20, 3.5, 14] }: WallsProps) {
         <mesh key={`win-${i}`} position={[x, h * 0.55, -d / 2 + thick / 2 + 0.01]}>
           <boxGeometry args={[1.8, 1.2, 0.02]} />
           <meshStandardMaterial
-            color="#8899bb"
+            color={brightOfficeTheme.windowColor}
             roughness={0.1}
             metalness={0.3}
             transparent
-            opacity={0.5}
-            emissive="#334466"
-            emissiveIntensity={0.2}
+            opacity={brightOfficeTheme.windowOpacity}
+            emissive={brightOfficeTheme.windowEmissive}
+            emissiveIntensity={brightOfficeTheme.windowEmissiveIntensity}
           />
         </mesh>
       ))}
@@ -35,29 +35,29 @@ export function Walls({ roomSize = [20, 3.5, 14] }: WallsProps) {
       {/* Left wall */}
       <mesh position={[-w / 2, h / 2, 0]} receiveShadow>
         <boxGeometry args={[thick, h, d]} />
-        <meshStandardMaterial color={wallColor} roughness={wallRoughness} />
+        <meshStandardMaterial color={brightOfficeTheme.wall} roughness={0.5} />
       </mesh>
 
       {/* Right wall */}
       <mesh position={[w / 2, h / 2, 0]} receiveShadow>
         <boxGeometry args={[thick, h, d]} />
-        <meshStandardMaterial color={wallColor} roughness={wallRoughness} />
+        <meshStandardMaterial color={brightOfficeTheme.wall} roughness={0.5} />
       </mesh>
 
       {/* Short divider between pending and done zones */}
       <mesh position={[0, h * 0.4, 3.5]} receiveShadow>
         <boxGeometry args={[0.1, h * 0.8, 2]} />
-        <meshStandardMaterial color="#3a3a48" roughness={0.6} transparent opacity={0.7} />
+        <meshStandardMaterial color={brightOfficeTheme.divider} roughness={0.6} transparent opacity={0.7} />
       </mesh>
 
       {/* Ceiling — semi-transparent for top-down readability */}
       <mesh position={[0, h, 0]} receiveShadow>
         <boxGeometry args={[w, 0.08, d]} />
         <meshStandardMaterial
-          color="#3a3a50"
-          roughness={0.8}
+          color={brightOfficeTheme.ceiling}
+          roughness={0.6}
           transparent
-          opacity={0.25}
+          opacity={brightOfficeTheme.ceilingOpacity}
           depthWrite={false}
         />
       </mesh>
