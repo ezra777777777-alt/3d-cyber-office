@@ -5,8 +5,8 @@ import * as THREE from 'three';
 import { useUIStore } from '@/store/uiStore';
 
 export const OFFICE_OVERVIEW_CAMERA = {
-  position: [13, 13, 15] as [number, number, number],
-  target: [0, 0, 0] as [number, number, number],
+  position: [5, 9, 11] as [number, number, number],
+  target: [0, 0, -1] as [number, number, number],
 };
 
 const DEFAULT_POSITION = new THREE.Vector3(...OFFICE_OVERVIEW_CAMERA.position);

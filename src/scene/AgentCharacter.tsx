@@ -216,23 +216,22 @@ function StatusMarker({
   const ref = useRef<THREE.Mesh>(null);
   const config = STATUS_CONFIG[status];
 
-  if (!config) return null;
-
   useFrame(() => {
-    if (ref.current) {
-      if (config.pulse) {
-        ref.current.scale.setScalar(config.scale + Math.abs(Math.sin(Date.now() * 0.006)) * 0.3);
-        const mat = ref.current.material as THREE.MeshBasicMaterial;
-        mat.opacity = 0.6 + Math.abs(Math.sin(Date.now() * 0.005)) * 0.4;
-      } else if (status === 'completed') {
-        const mat = ref.current.material as THREE.MeshBasicMaterial;
-        mat.opacity = 0.5 + Math.sin(Date.now() * 0.002) * 0.15;
-      } else if (status === 'resting') {
-        const mat = ref.current.material as THREE.MeshBasicMaterial;
-        mat.opacity = 0.3 + Math.sin(Date.now() * 0.003) * 0.1;
-      }
+    if (!ref.current || !config) return;
+    if (config.pulse) {
+      ref.current.scale.setScalar(config.scale + Math.abs(Math.sin(Date.now() * 0.006)) * 0.3);
+      const mat = ref.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = 0.6 + Math.abs(Math.sin(Date.now() * 0.005)) * 0.4;
+    } else if (status === 'completed') {
+      const mat = ref.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = 0.5 + Math.sin(Date.now() * 0.002) * 0.15;
+    } else if (status === 'resting') {
+      const mat = ref.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = 0.3 + Math.sin(Date.now() * 0.003) * 0.1;
     }
   });
+
+  if (!config) return null;
 
   return (
     <mesh ref={ref} position={position}>

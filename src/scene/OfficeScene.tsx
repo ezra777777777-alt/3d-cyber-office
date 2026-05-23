@@ -21,11 +21,11 @@ export function OfficeScene() {
   const clearSelection = useUIStore((s) => s.clearSelection);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full office-canvas-wrapper">
       <Canvas
         shadows
         gl={{ antialias: true, alpha: false }}
-        style={{ background: '#1a1a2a' }}
+        style={{ background: '#1e1e35' }}
         onClick={() => clearSelection()}
       >
         <Lighting />
@@ -63,7 +63,7 @@ export function OfficeScene() {
 
         <CameraController />
         <ResetCameraBtn />
-        <fog attach="fog" args={['#1a1a2a', 18, 35]} />
+        <fog attach="fog" args={['#1e1e35', 22, 40]} />
       </Canvas>
     </div>
   );

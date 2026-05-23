@@ -50,10 +50,16 @@ export function Walls({ roomSize = [20, 3.5, 14] }: WallsProps) {
         <meshStandardMaterial color="#3a3a48" roughness={0.6} transparent opacity={0.7} />
       </mesh>
 
-      {/* Ceiling */}
+      {/* Ceiling — semi-transparent for top-down readability */}
       <mesh position={[0, h, 0]} receiveShadow>
         <boxGeometry args={[w, 0.08, d]} />
-        <meshStandardMaterial color="#3a3a50" roughness={0.8} />
+        <meshStandardMaterial
+          color="#3a3a50"
+          roughness={0.8}
+          transparent
+          opacity={0.25}
+          depthWrite={false}
+        />
       </mesh>
     </group>
   );

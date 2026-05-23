@@ -66,10 +66,34 @@
     pointer-events: auto;
   }
 
-  /* Narrow screen: compact status bar */
+  /* Narrow screen responsive overrides */
   @media (max-width: 640px) {
+    .nav-brand {
+      @apply text-[10px] mr-1 hidden;
+    }
+    .nav-btn {
+      @apply px-1.5 py-0.5 text-[10px];
+    }
     .status-bar-text {
       @apply text-[10px] leading-tight;
     }
+    .status-bar-item {
+      @apply gap-0.5;
+    }
+    .bottom-hud {
+      @apply flex-col gap-1;
+    }
+    .bottom-hud .demo-controls {
+      @apply w-full;
+    }
+    .side-panel {
+      @apply w-56 max-h-[50vh];
+    }
+  }
+
+  /* Ensure canvas never collapses below visible size */
+  .office-canvas-wrapper canvas {
+    min-width: 300px;
+    min-height: 150px;
   }
 }
