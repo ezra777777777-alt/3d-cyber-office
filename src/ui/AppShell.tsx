@@ -9,6 +9,7 @@ import { StatusBar } from './StatusBar';
 import { SidePanel } from './SidePanel';
 import { EventFeed } from './EventFeed';
 import { DemoControls } from './DemoControls';
+import { ResetCameraBtn } from './ResetCameraBtn';
 import { OfficeScene } from '@/scene/OfficeScene';
 import { CalendarView } from './dashboard/CalendarView';
 import { LogsView } from './dashboard/LogsView';
@@ -162,6 +163,13 @@ export function AppShell() {
           <div className="absolute top-2 right-2 z-10">
             <SidePanel />
           </div>
+          {/* Camera reset — office mode, top-right, outside Canvas DOM */}
+          {activeModule === 'office' && (
+            <div className="absolute top-2 right-2 z-20 pointer-events-auto">
+              <ResetCameraBtn />
+            </div>
+          )}
+
           {/* Event feed & demo controls always visible in office mode */}
           {activeModule === 'office' && (
             <div className="absolute bottom-2 left-2 right-2 z-20 flex gap-2 bottom-hud pointer-events-auto">

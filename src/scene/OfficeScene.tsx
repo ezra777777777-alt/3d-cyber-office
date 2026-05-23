@@ -11,7 +11,6 @@ import { Whiteboard } from './Whiteboard';
 import { Cabinet } from './Cabinet';
 import { SceneDecor } from './SceneDecor';
 import { PendingMarker, DoneMarker } from './ZoneMarkers';
-import { ResetCameraBtn } from '@/ui/ResetCameraBtn';
 import { defaultLayout } from '@/data/defaultLayout';
 import { ZoneLabel } from './ZoneLabel';
 import { CommanderStation } from './CommanderStation';
@@ -62,7 +61,6 @@ export function OfficeScene() {
         <DoneMarker />
 
         <CameraController />
-        <ResetCameraBtn />
         <fog attach="fog" args={['#1e1e35', 22, 40]} />
       </Canvas>
     </div>

@@ -12,14 +12,31 @@ export const OFFICE_OVERVIEW_CAMERA = {
 const DEFAULT_POSITION = new THREE.Vector3(...OFFICE_OVERVIEW_CAMERA.position);
 const DEFAULT_TARGET = new THREE.Vector3(...OFFICE_OVERVIEW_CAMERA.target);
 
+// Module-level camera ref so external UI (outside Canvas) can reset view
+let _camera: THREE.Camera | null = null;
+
+export function getCamera(): THREE.Camera | null {
+  return _camera;
+}
+
+export function ExternalResetCamera() {
+  const cam = _camera;
+  if (!cam) return;
+  cam.position.copy(DEFAULT_POSITION);
+  cam.lookAt(DEFAULT_TARGET);
+  useUIStore.getState().setCameraFocus(null);
+}
+
 export function CameraController() {
   const controlsRef = useRef<any>(null);
   const { camera } = useThree();
   const cameraFocus = useUIStore((s) => s.cameraFocus);
 
   useEffect(() => {
+    _camera = camera;
     camera.position.copy(DEFAULT_POSITION);
     camera.lookAt(DEFAULT_TARGET);
+    return () => { _camera = null; };
   }, [camera]);
 
   useFrame(() => {
