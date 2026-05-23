@@ -28,4 +28,7 @@ export const useEventStore = create<EventState>((set, get) => ({
     get().events.filter((e) => e.agentId === agentId),
 
   clear: () => set({ events: [] }),
+  getRuntimeEvents: () => get().events.filter((e) => e.source === 'runtime'),
+  getEventsByRuntimeId: (runtimeEventId: string) =>
+    get().events.filter((e) => e.runtimeEventId === runtimeEventId),
 }));
