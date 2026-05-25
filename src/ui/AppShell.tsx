@@ -13,6 +13,7 @@ import { GuidedDemoHud } from './GuidedDemoHud';
 import { RuntimeModeSwitch } from './runtime/RuntimeModeSwitch';
 import { OfficeScene } from '@/scene/OfficeScene';
 import { OfficePresentationLayer } from './office/OfficePresentationLayer';
+import { StudioOfficeShell } from './office/StudioOfficeShell';
 
 const CalendarView = lazy(() => import('./dashboard/CalendarView').then((m) => ({ default: m.CalendarView })));
 const TasksView = lazy(() => import('./dashboard/TasksView').then((m) => ({ default: m.TasksView })));
@@ -37,6 +38,7 @@ export function AppShell() {
   const demoRunning = useUIStore((s) => s.demoRunning);
   const demoPaused = useUIStore((s) => s.demoPaused);
   const setDemoRunning = useUIStore((s) => s.setDemoRunning);
+  const officeVisualStyle = useUIStore((s) => s.officeVisualStyle);
 
   // Subscribe to event bus on mount
   useEffect(() => {
@@ -224,7 +226,7 @@ export function AppShell() {
         {activeModule === 'office' ? (
           <div className="flex-1 relative office-stage">
             <OfficeScene />
-            <OfficePresentationLayer />
+            {officeVisualStyle === 'claw3d' ? <StudioOfficeShell /> : <OfficePresentationLayer />}
           </div>
         ) : (
           /* Workbench: SidePanel docks on the right (desktop), overlays on narrow screens */

@@ -11,6 +11,8 @@ export function StatusBar() {
   const lastHeartbeatAt = useRuntimeStore((s) => s.lastHeartbeatAt);
   const visualMode = useUIStore((s) => s.visualMode ?? 'normal');
   const setVisualMode = useUIStore((s) => s.setVisualMode);
+  const officeVisualStyle = useUIStore((s) => s.officeVisualStyle);
+  const setOfficeVisualStyle = useUIStore((s) => s.setOfficeVisualStyle);
 
   const total = tasks.length;
   const running = tasks.filter((t) => t.status === 'running').length;
@@ -51,11 +53,32 @@ export function StatusBar() {
           </button>
         ))}
       </div>
+      <div className="flex items-center gap-1 status-bar-item">
+        {(['current', 'claw3d'] as const).map((style) => (
+          <button
+            key={style}
+            onClick={() => setOfficeVisualStyle(style)}
+            className={`text-[10px] px-1.5 py-0.5 rounded border ${
+              officeVisualStyle === style
+                ? 'border-orange-400 text-orange-400 bg-orange-400/10'
+                : 'border-gray-600 text-gray-500 hover:border-gray-400'
+            }`}
+          >
+            {style === 'current' ? 'Plan18' : 'Claw3D'}
+          </button>
+        ))}
+      </div>
       <div className="flex items-center gap-1.5 status-bar-item ml-auto">
-        <span className="text-gray-500 status-bar-text">运行时：{labelForRuntimeMode(runtimeMode)} / {labelForRuntimeStatus(runtimeStatus)}</span>
+        <span className="text-gray-500 status-bar-text">
+          运行时：{labelForRuntimeMode(runtimeMode)} / {labelForRuntimeStatus(runtimeStatus)}
+        </span>
         {lastHeartbeatAt && (
           <span className="status-bar-text text-gray-500">
-            心跳：{new Date(lastHeartbeatAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            心跳：{new Date(lastHeartbeatAt).toLocaleTimeString('zh-CN', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })}
           </span>
         )}
       </div>

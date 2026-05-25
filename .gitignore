@@ -10,3 +10,8 @@ qa-artifacts/
 playwright-report/
 test-results/
 *.log
+.video-tools/
+.video-tools-local/
+.video-reference-frames/
+.visual-qa-*/
+.codex-video-review/

@@ -16,9 +16,11 @@ interface UIState {
   guidedDemoProgress: number;
   guidedCameraShot: GuidedCameraShot | null;
   visualMode: 'low' | 'normal' | 'showcase';
+  officeVisualStyle: 'current' | 'claw3d';
 
   selectAgent: (id: string | null) => void;
   setVisualMode: (mode: 'low' | 'normal' | 'showcase') => void;
+  setOfficeVisualStyle: (style: 'current' | 'claw3d') => void;
   selectTask: (id: string | null) => void;
   setActiveModule: (module: string) => void;
   setDemoRunning: (running: boolean) => void;
@@ -49,10 +51,12 @@ export const useUIStore = create<UIState>()(
       guidedDemoProgress: 0,
       guidedCameraShot: null,
       visualMode: 'normal',
+      officeVisualStyle: 'claw3d',
 
       selectAgent: (id) =>
         set({ selectedAgentId: id, selectedTaskId: null }),
       setVisualMode: (visualMode) => set({ visualMode }),
+      setOfficeVisualStyle: (officeVisualStyle) => set({ officeVisualStyle }),
       selectTask: (id) =>
         set({ selectedTaskId: id, selectedAgentId: null }),
       setActiveModule: (module) => set({ activeModule: module }),
