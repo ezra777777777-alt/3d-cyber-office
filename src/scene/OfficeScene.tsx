@@ -1,4 +1,5 @@
-import { Canvas } from '@react-three/fiber';
+import { useEffect } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
 import { useOfficeStore } from '@/store/officeStore';
 import { useUIStore } from '@/store/uiStore';
 import { Lighting } from './Lighting';
@@ -17,6 +18,16 @@ import { CommanderStation } from './CommanderStation';
 import { CommanderVisualLayer } from './CommanderVisualLayer';
 import { brightOfficeTheme } from './sceneVisualTheme';
 
+const BG = brightOfficeTheme.firstScreenBackground;
+
+function ForceInitialRender() {
+  const { gl, scene, camera } = useThree();
+  useEffect(() => {
+    gl.render(scene, camera);
+  }, [gl, scene, camera]);
+  return null;
+}
+
 export function OfficeScene() {
   const desks = useOfficeStore((s) => s.desks);
   const clearSelection = useUIStore((s) => s.clearSelection);
@@ -24,8 +35,10 @@ export function OfficeScene() {
   return (
     <div className="w-full h-full office-canvas-wrapper">
       <Canvas
-        shadows
-        gl={{ antialias: true, alpha: false }}
+        gl={{ antialias: false, alpha: false }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(BG);
+        }}
         onClick={() => clearSelection()}
       >
         <color attach="background" args={[brightOfficeTheme.background]} />
@@ -35,17 +48,14 @@ export function OfficeScene() {
         <Floor />
         <Walls />
 
-        {/* Zone labels and commander focal point */}
         <CommanderStation />
         <CommanderVisualLayer />
         {defaultLayout.zones.map((zone) => (
           <ZoneLabel key={zone.id} zone={zone} />
         ))}
 
-        {/* Environmental decor: lamps, plants, delivery rack, rest corner */}
         <SceneDecor />
 
-        {/* Main work area — 4 workstations */}
         <group>
           {desks
             .filter((desk) => desk.zone === 'commander' || desk.zone === 'workstation')
@@ -54,18 +64,14 @@ export function OfficeScene() {
             ))}
         </group>
 
-        {/* Collaboration area — meeting table */}
         <MeetingTable />
-
-        {/* Pending zone — whiteboard + marker */}
         <Whiteboard />
         <PendingMarker />
-
-        {/* Completed zone — cabinet + marker */}
         <Cabinet />
         <DoneMarker />
 
         <CameraController />
+        <ForceInitialRender />
       </Canvas>
     </div>
   );

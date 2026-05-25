@@ -62,6 +62,20 @@ describe('migration bundle safety', () => {
     ]);
   });
 
+  it('drops stale commanderOpen from UI import writes', () => {
+    const bundle = buildMigrationBundle(storage, {
+      origin: 'http://127.0.0.1:5173',
+      userAgent: 'vitest',
+      now: '2026-05-23T00:00:00.000Z',
+    });
+
+    const uiWrite = getImportPlan(bundle).writes.find((write) => write.key === 'cyber-office-ui');
+    expect(uiWrite).toBeDefined();
+    expect(JSON.parse(uiWrite!.serializedValue)).toEqual({
+      state: { activeModule: 'office' },
+    });
+  });
+
   it('parses exported bundle text for import preview', () => {
     const bundle = buildMigrationBundle(storage, {
       origin: 'http://127.0.0.1:5173',

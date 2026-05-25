@@ -5,7 +5,7 @@ import { useCommanderStore } from '@/store/commanderStore';
 import { startDemoEngine, stopDemoEngine } from '@/demo/demoEngine';
 import { fullDemoScenario } from '@/demo/scenarios';
 import { commanderFullScenario, commanderApprovedDeliveryScenario } from '@/demo/commanderScenario';
-import { buildGuidedDemoTimeline } from '@/demo/guidedDemoTimeline';
+import { buildVideoReplicaGuidedTimeline } from '@/demo/videoReplicaGuidedTimeline';
 import { actionLabels } from '@/i18n/zh';
 
 export function DemoControls() {
@@ -29,7 +29,7 @@ export function DemoControls() {
       createMissionFromDraft();
       setDemoRunning(true);
       setDemoPaused(false);
-      startDemoEngine(buildGuidedDemoTimeline());
+      startDemoEngine(buildVideoReplicaGuidedTimeline());
     } catch (err) {
       console.error('[DemoControls] Guided demo start failed:', err);
     }
@@ -95,7 +95,7 @@ export function DemoControls() {
 
   return (
     <div
-      className="m-2 p-2 flex items-center gap-2 rounded-lg border border-cyber-border bg-cyber-panel flex-wrap"
+      className="m-2 p-2 grid grid-cols-2 sm:flex sm:items-center gap-2 rounded-lg border border-cyber-border bg-cyber-panel"
       style={{ zIndex: 50, position: 'relative' }}
     >
       <span className="text-gray-500 text-xs font-medium">演示</span>

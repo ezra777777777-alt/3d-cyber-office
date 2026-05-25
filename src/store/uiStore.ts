@@ -15,8 +15,10 @@ interface UIState {
   guidedDemoBody: string | null;
   guidedDemoProgress: number;
   guidedCameraShot: GuidedCameraShot | null;
+  visualMode: 'low' | 'normal' | 'showcase';
 
   selectAgent: (id: string | null) => void;
+  setVisualMode: (mode: 'low' | 'normal' | 'showcase') => void;
   selectTask: (id: string | null) => void;
   setActiveModule: (module: string) => void;
   setDemoRunning: (running: boolean) => void;
@@ -40,15 +42,17 @@ export const useUIStore = create<UIState>()(
       demoRunning: false,
       demoPaused: false,
       cameraFocus: null,
-      commanderOpen: true,
+      commanderOpen: typeof window !== 'undefined' ? window.innerWidth >= 640 : true,
       selectedMissionTaskId: null,
       guidedDemoTitle: null,
       guidedDemoBody: null,
       guidedDemoProgress: 0,
       guidedCameraShot: null,
+      visualMode: 'normal',
 
       selectAgent: (id) =>
         set({ selectedAgentId: id, selectedTaskId: null }),
+      setVisualMode: (visualMode) => set({ visualMode }),
       selectTask: (id) =>
         set({ selectedTaskId: id, selectedAgentId: null }),
       setActiveModule: (module) => set({ activeModule: module }),
@@ -74,6 +78,7 @@ export const useUIStore = create<UIState>()(
       name: 'cyber-office-ui',
       partialize: (state) => ({
         activeModule: state.activeModule,
+        visualMode: state.visualMode,
       }),
     },
   ),

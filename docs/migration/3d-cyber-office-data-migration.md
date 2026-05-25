@@ -33,12 +33,21 @@ Not migrated:
 6. Copy the project source code through git or a zip archive.
 7. Copy the downloaded migration JSON to the target computer.
 
+## 源码级迁移说明
+
+项目支持源码复制迁移。推荐使用英文路径避免工具兼容问题：
+
+- Windows: `D:\projects\3d-cyber-office`
+- macOS: `~/Projects/3d-cyber-office`
+
+复制源码时排除 `node_modules/`、`dist/`、`.vite/`、`*.log`、`tsconfig.tsbuildinfo`。
+
 ## Target Computer Steps
 
 1. Install Node.js 18 or newer.
 2. Copy or clone the project.
-3. Run `npm install`.
-4. Run `npm run dev`.
+3. Run `npm install`（Windows 使用 `npm.cmd install`）。
+4. Run `npm run dev`（Windows 使用 `npm.cmd run dev`）。
 5. Open the printed Vite URL.
 6. Open `Migration`.
 7. Paste the migration JSON into `Import package`.

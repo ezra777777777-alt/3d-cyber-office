@@ -13,3 +13,6 @@
 - [ ] Commander mission state restored.
 - [ ] Demo still runs.
 - [ ] Runtime credentials recreated manually if needed.
+- [ ] Restore drill report completed.
+- [ ] Target machine ran `npm install` locally.
+- [ ] `node_modules/` was not copied between machines.

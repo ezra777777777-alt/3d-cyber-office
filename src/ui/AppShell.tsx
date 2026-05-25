@@ -8,13 +8,11 @@ import { useCommanderStore } from '@/store/commanderStore';
 import { Navigation } from './Navigation';
 import { StatusBar } from './StatusBar';
 import { SidePanel } from './SidePanel';
-import { EventFeed } from './EventFeed';
 import { DemoControls } from './DemoControls';
-import { ResetCameraBtn } from './ResetCameraBtn';
-import { CommanderDock } from './commander/CommanderDock';
 import { GuidedDemoHud } from './GuidedDemoHud';
 import { RuntimeModeSwitch } from './runtime/RuntimeModeSwitch';
 import { OfficeScene } from '@/scene/OfficeScene';
+import { OfficePresentationLayer } from './office/OfficePresentationLayer';
 
 const CalendarView = lazy(() => import('./dashboard/CalendarView').then((m) => ({ default: m.CalendarView })));
 const TasksView = lazy(() => import('./dashboard/TasksView').then((m) => ({ default: m.TasksView })));
@@ -224,23 +222,9 @@ export function AppShell() {
       </div>
       <div className="flex-1 flex relative overflow-hidden">
         {activeModule === 'office' ? (
-          /* Office: SidePanel floats as absolute overlay over 3D canvas */
-          <div className="flex-1 relative">
+          <div className="flex-1 relative office-stage">
             <OfficeScene />
-            <div className="absolute top-2 right-2 z-10">
-              <SidePanel />
-            </div>
-            <div className="absolute top-2 left-2 z-10 pointer-events-auto">
-              <CommanderDock />
-            </div>
-            <div className="absolute top-2 right-2 z-20 pointer-events-auto">
-              <ResetCameraBtn />
-            </div>
-            <div className="absolute bottom-2 left-2 right-2 z-20 flex gap-2 bottom-hud pointer-events-auto">
-              <div className="flex-1 min-w-0">
-                <EventFeed />
-              </div>
-            </div>
+            <OfficePresentationLayer />
           </div>
         ) : (
           /* Workbench: SidePanel docks on the right (desktop), overlays on narrow screens */

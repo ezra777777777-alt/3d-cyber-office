@@ -14,6 +14,7 @@ export function ArtifactRail() {
   const selectedMissionId = useCommanderStore((state) => state.selectedMissionId);
   const missions = useCommanderStore((state) => state.missions);
   const workers = useCommanderStore((state) => state.workers);
+  const approvals = useCommanderStore((state) => state.approvals);
 
   const mission = selectedMissionId ? missions[selectedMissionId] : undefined;
 
@@ -36,6 +37,15 @@ export function ArtifactRail() {
       <div className="artifact-rail">
         {items.map((artifact) => {
           const worker = workers.find((w) => w.id === artifact.createdByWorkerId);
+          const task = mission?.tasks[artifact.taskId];
+          const linkedApproval = task?.approvalId ? approvals[task.approvalId] : undefined;
+          const approvalLabel = linkedApproval
+            ? linkedApproval.status === 'approved'
+              ? '已审批'
+              : linkedApproval.status === 'rejected'
+                ? '已驳回'
+                : '待审批'
+            : null;
           return (
             <div key={artifact.id} className={`artifact-card ${mission ? 'artifact-card-delivered' : ''}`}>
               <div className="artifact-card-head">
@@ -46,6 +56,13 @@ export function ArtifactRail() {
               <small>{artifact.path}</small>
               <div className="artifact-meta">
                 <span>{worker?.name ?? artifact.createdByWorkerId}</span>
+                {task && <span className="artifact-task-source">任务：{task.title}</span>}
+                {approvalLabel && (
+                  <span className={`artifact-approval-label artifact-approval-${linkedApproval!.status}`}>
+                    {approvalLabel}
+                  </span>
+                )}
+                <span className="artifact-delivered-label">已交付到 Files</span>
               </div>
               <button
                 className="cyber-btn text-xs mt-2"

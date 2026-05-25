@@ -1,5 +1,6 @@
 import { useOfficeStore } from '@/store/officeStore';
 import { useRuntimeStore } from '@/store/runtimeStore';
+import { useUIStore } from '@/store/uiStore';
 import { labelForRuntimeMode, labelForRuntimeStatus } from '@/i18n/zh';
 
 export function StatusBar() {
@@ -8,6 +9,8 @@ export function StatusBar() {
   const runtimeMode = useRuntimeStore((s) => s.mode);
   const runtimeStatus = useRuntimeStore((s) => s.status);
   const lastHeartbeatAt = useRuntimeStore((s) => s.lastHeartbeatAt);
+  const visualMode = useUIStore((s) => s.visualMode ?? 'normal');
+  const setVisualMode = useUIStore((s) => s.setVisualMode);
 
   const total = tasks.length;
   const running = tasks.filter((t) => t.status === 'running').length;
@@ -33,6 +36,21 @@ export function StatusBar() {
           </span>
         </div>
       ))}
+      <div className="flex items-center gap-1 status-bar-item">
+        {(['low', 'normal', 'showcase'] as const).map((mode) => (
+          <button
+            key={mode}
+            onClick={() => setVisualMode(mode)}
+            className={`text-[10px] px-1.5 py-0.5 rounded border ${
+              visualMode === mode
+                ? 'border-cyber-accent text-cyber-accent bg-cyber-accent/10'
+                : 'border-gray-600 text-gray-500 hover:border-gray-400'
+            }`}
+          >
+            {mode === 'low' ? 'Low' : mode === 'normal' ? 'Normal' : 'Show'}
+          </button>
+        ))}
+      </div>
       <div className="flex items-center gap-1.5 status-bar-item ml-auto">
         <span className="text-gray-500 status-bar-text">运行时：{labelForRuntimeMode(runtimeMode)} / {labelForRuntimeStatus(runtimeStatus)}</span>
         {lastHeartbeatAt && (

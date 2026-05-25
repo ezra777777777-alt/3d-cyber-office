@@ -160,4 +160,13 @@ describe('Commander visual state', () => {
       linkTargets: [],
     });
   });
+
+  it('highlights active workers and linked artifacts during guided delivery', () => {
+    const state = buildCommanderVisualState(mission, {}, workers);
+
+    expect(state.linkTargets.length).toBeGreaterThan(0);
+    expect(state.linkTargets.every((target) => target.deskId)).toBe(true);
+    expect(state.linkTargets.every((target) => target.workerId)).toBe(true);
+    expect(state.linkTargets.every((target) => target.missionTaskId)).toBe(true);
+  });
 });

@@ -135,6 +135,15 @@ The adapter implementations run inside the UI process but must only communicate 
 
 Tests live in `src/ai/commanderAdapterTesting.test.ts` and cover risk classification, planner validation, secret detection, event normalization, mock planner structure, mock worker approval lifecycle, and guarded adapter refusal.
 
+## Next Steps
+
+The real runtime integration decision is documented in:
+
+- **[runtime-integration-options.md](./runtime-integration-options.md)** — Candidate approaches and trade-offs
+- **[runtime-integration-decision.md](./runtime-integration-decision.md)** — Architecture Decision Record
+- **[runtime-security-checklist.md](./runtime-security-checklist.md)** — Security requirements for any real runtime
+- **[local-runtime-protocol-sketch.md](./local-runtime-protocol-sketch.md)** — Protocol message format
+
 ## Migration Notes
 
 - Commander store fields `adapterMode`, `adapterStatus`, `adapterError` are NOT persisted (except `adapterMode`). On page reload, mode restores but status resets to `idle`.

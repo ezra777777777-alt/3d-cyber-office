@@ -3,10 +3,11 @@ import { useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { useUIStore } from '@/store/uiStore';
+import { FIRST_SCREEN_CAMERA } from './firstScreenFidelity';
 
 export const OFFICE_OVERVIEW_CAMERA = {
-  position: [5, 9, 11] as [number, number, number],
-  target: [0, 0, -1] as [number, number, number],
+  position: FIRST_SCREEN_CAMERA.position,
+  target: FIRST_SCREEN_CAMERA.target,
 };
 
 const DEFAULT_POSITION = new THREE.Vector3(...OFFICE_OVERVIEW_CAMERA.position);

@@ -5,6 +5,13 @@ export const brightOfficeTheme = {
   fogNear: 30,
   fogFar: 58,
 
+  // First-screen brightness tokens
+  firstScreenAmbientBoost: 1.25,
+  firstScreenKeyLightBoost: 1.18,
+  firstScreenBackground: '#e7f4ff',
+  firstScreenFloor: '#8ea4b8',
+  firstScreenWall: '#bfd0df',
+
   // Primary surfaces
   floor: '#7f93a8',
   floorRoughness: 0.52,
@@ -29,6 +36,7 @@ export const brightOfficeTheme = {
   // Accents
   commanderAccent: '#ffb84d',
   commanderGlow: '#ffd27a',
+  commanderLightIntensity: 0.55,
   workerAccent: '#00dff6',
 
   // Derived — desk and furniture (not in plan spec, derived from wall/floor)

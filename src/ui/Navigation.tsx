@@ -19,7 +19,7 @@ export function Navigation() {
   const setActiveModule = useUIStore((s) => s.setActiveModule);
 
   return (
-    <nav className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 border-b border-cyber-border bg-cyber-panel/80 backdrop-blur-sm flex-wrap">
+    <nav className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 border-b border-cyber-border bg-cyber-panel/80 backdrop-blur-sm flex-wrap mobile-nav-scroll">
       <div className="text-cyber-accent font-semibold text-xs sm:text-sm mr-2 sm:mr-4 tracking-wider whitespace-nowrap">
         3D 赛博办公室
       </div>

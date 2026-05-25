@@ -1,5 +1,6 @@
 import { useCommanderStore } from '@/store/commanderStore';
 import { summarizeMission } from '@/commander/commanderTesting';
+import { buildCommanderExperienceState } from '@/commander/commanderExperience';
 
 export function MissionSummary() {
   const selectedMissionId = useCommanderStore((state) => state.selectedMissionId);
@@ -18,16 +19,29 @@ export function MissionSummary() {
   );
 
   const summary = summarizeMission(mission, approvalList, deliveredIds);
+  const experience = buildCommanderExperienceState(mission, approvals, artifacts);
+
+  const statusLabels: Record<string, string> = {
+    draft: '草稿',
+    planned: '已规划',
+    running: '执行中',
+    waiting_input: '等待输入',
+    approval_required: '等待审批',
+    blocked: '阻塞',
+    completed: '已完成',
+  };
 
   return (
     <section className="commander-section">
       <header className="commander-section-title">
         <span>任务总结</span>
         <span className={`commander-pill ${mission.status === 'completed' ? 'commander-pill-done' : ''}`}>
-          {mission.status === 'completed' ? '已完成' : mission.status}
+          {statusLabels[mission.status] ?? mission.status}
         </span>
       </header>
-      {mission.summary && <p className="mission-summary-text">{mission.summary}</p>}
+      <p className="mission-summary-text">
+        {experience.nextAction}
+      </p>
       <div className="mission-summary-grid">
         <div className="summary-stat">
           <span className="summary-stat-value">{summary.completedCount}/{summary.taskCount}</span>

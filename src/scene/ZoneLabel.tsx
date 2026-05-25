@@ -1,4 +1,3 @@
-import { Text } from '@react-three/drei';
 import type { SceneZone } from '@/core/types';
 
 export function ZoneLabel({ zone }: { zone: SceneZone }) {
@@ -12,12 +11,16 @@ export function ZoneLabel({ zone }: { zone: SceneZone }) {
         <planeGeometry args={[1.8, 0.035]} />
         <meshBasicMaterial color={zone.accent} transparent opacity={0.95} />
       </mesh>
-      <Text position={[0, 0.11, 0]} fontSize={0.21} color="#f7fbff" anchorX="center" anchorY="middle">
-        {zone.label}
-      </Text>
-      <Text position={[0, -0.12, 0]} fontSize={0.11} color={zone.accent} anchorX="center" anchorY="middle">
-        {zone.subtitle}
-      </Text>
+      {/* Label indicator bar — replaces Text */}
+      <mesh position={[0, 0.11, 0]}>
+        <boxGeometry args={[0.8, 0.06, 0.01]} />
+        <meshBasicMaterial color="#f7fbff" transparent opacity={0.85} />
+      </mesh>
+      {/* Subtitle indicator bar — replaces Text */}
+      <mesh position={[0, -0.12, 0]}>
+        <boxGeometry args={[1.2, 0.03, 0.01]} />
+        <meshBasicMaterial color={zone.accent} transparent opacity={0.7} />
+      </mesh>
     </group>
   );
 }

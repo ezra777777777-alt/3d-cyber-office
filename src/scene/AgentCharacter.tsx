@@ -4,6 +4,8 @@ import { useFrame } from '@react-three/fiber';
 import { useOfficeStore } from '@/store/officeStore';
 import { useUIStore } from '@/store/uiStore';
 import type { AgentStatus } from '@/core/types';
+import { getRoleStyle } from './characterStyleConfig';
+import { AssistantPod, LobsterCommandPod } from './CharacterKit';
 
 interface AgentCharacterProps {
   agentId: string;
@@ -11,179 +13,82 @@ interface AgentCharacterProps {
   deskRotation?: number;
 }
 
-const ROLE_COLORS: Record<string, string> = {
-  research: '#4fc3f7',
-  coding: '#00e676',
-  writing: '#ffab40',
-  analysis: '#b347ea',
-  coordinator: '#ffb84d',
-};
-
-const ROLE_BODY_COLORS: Record<string, string> = {
-  research: '#5a6a7a',
-  coding: '#5a6a5a',
-  writing: '#6a6a5a',
-  analysis: '#6a5a6a',
-  coordinator: '#6a6a6a',
+const STATUS_COLOR_MAP: Record<string, string> = {
+  blocked: '#ff3366',
+  failed: '#ff1144',
+  waiting_input: '#f0a500',
+  approval_required: '#ffb84d',
+  completed: '#00e676',
+  resting: '#7ce3aa',
+  working: '#4fc3f7',
+  idle: '#aab8c2',
+  planning: '#c0c8d4',
+  offline: '#667788',
 };
 
 export function AgentCharacter({ agentId, position, deskRotation = 0 }: AgentCharacterProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const bodyRef = useRef<THREE.Group>(null);
-  const headRef = useRef<THREE.Group>(null);
+  const pulseRef = useRef<THREE.Group>(null);
+  const ringRef = useRef<THREE.Mesh>(null);
   const agent = useOfficeStore((s) => s.getAgent(agentId));
   const selectedAgentId = useUIStore((s) => s.selectedAgentId);
   const selectAgent = useUIStore((s) => s.selectAgent);
 
   if (!agent) return null;
 
-  const isSelected = agent.id === selectedAgentId;
+  const selected = agent.id === selectedAgentId;
   const status: AgentStatus = agent.status;
-  const isWorking = status === 'working';
-  const isBlocked = status === 'blocked';
-  const isFailed = status === 'failed';
-  const needsInput = status === 'waiting_input';
-  const needsApproval = status === 'approval_required';
-  const isCompleted = status === 'completed';
-  const isResting = status === 'resting';
-  const roleColor = ROLE_COLORS[agent.role] || '#00f0ff';
-  const bodyColor = ROLE_BODY_COLORS[agent.role] || '#1a1a2e';
-  const isCommander = agent.role === 'coordinator';
-
-  // Posture offsets: sit for working/completed, stand otherwise
-  const isSitting = isWorking || isCompleted;
-  const bodyY = isSitting ? 0.48 : 0.65;
-  const headY = isSitting ? 0.9 : 1.05;
+  const style = getRoleStyle(agent.id);
+  const statusColor = STATUS_COLOR_MAP[status] ?? '#aab8c2';
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
     const t = Date.now() * 0.001;
 
-    if (isSelected) {
+    // Selection rotation
+    if (selected) {
       groupRef.current.rotation.y += delta * 0.5;
     }
 
-    if (bodyRef.current) {
-      if (isWorking) {
-        bodyRef.current.rotation.x = -0.15 + Math.sin(t * 2) * 0.02;
-        bodyRef.current.position.y = Math.sin(t * 3) * 0.015 + 0.48;
-      } else if (isBlocked || isFailed) {
-        bodyRef.current.rotation.x = 0.1;
-        bodyRef.current.position.y = 0.65;
-      } else if (needsInput) {
-        bodyRef.current.rotation.x = -0.25;
-        bodyRef.current.position.y = 0.65;
-      } else if (needsApproval) {
-        bodyRef.current.rotation.x = -0.12 + Math.sin(t * 1.5) * 0.03;
-        bodyRef.current.position.y = 0.65;
-      } else if (isCompleted) {
-        bodyRef.current.rotation.x = -0.05;
-        bodyRef.current.position.y = 0.48 + Math.sin(t * 0.8) * 0.005;
-      } else if (isResting) {
-        bodyRef.current.rotation.x = 0.05 + Math.sin(t * 0.5) * 0.02;
-        bodyRef.current.position.y = 0.65;
-      } else {
-        // Idle — gentle sway
-        bodyRef.current.rotation.x = Math.sin(t * 0.8) * 0.03;
-        bodyRef.current.position.y = 0.65 + Math.sin(t * 1.2) * 0.01;
+    // Pulse animation on character kit
+    if (pulseRef.current) {
+      let pulse = 1.0;
+      if (status === 'working') {
+        pulse = 1.05 + Math.sin(t * 3.2) * 0.015;
+      } else if (status === 'blocked' || status === 'failed') {
+        pulse = 1.02;
       }
+      pulseRef.current.scale.setScalar(pulse);
+    }
+
+    // Selection ring animation
+    if (ringRef.current && selected) {
+      const ringPulse = 1.0 + Math.sin(t * 2.5) * 0.06;
+      ringRef.current.scale.setScalar(ringPulse);
+      const mat = ringRef.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = 0.5 + Math.sin(t * 3.0) * 0.25;
     }
   });
 
-  const showLegs = !isSitting;
-  const legLength = isSitting ? 0.15 : 0.4;
-  const legY = isSitting ? 0.15 : 0.2;
-
   return (
-    <group ref={groupRef} position={position} rotation={[0, deskRotation, 0]} scale={isCommander ? 1.12 : 1}>
-      <group ref={bodyRef} position={[0, bodyY, 0]}>
-        {/* Torso */}
-        <mesh position={[0, 0, 0]} castShadow>
-          <boxGeometry args={[0.35, 0.5, 0.22]} />
-          <meshStandardMaterial color={bodyColor} roughness={0.5} />
-        </mesh>
-
-        {/* Head */}
-        <group ref={headRef} position={[0, 0.35, 0]}>
-          <mesh castShadow>
-            <sphereGeometry args={[0.13, 16, 16]} />
-            <meshStandardMaterial color="#8a95a5" roughness={0.4} />
-          </mesh>
-          {/* Eyes */}
-          <mesh position={[-0.04, 0.02, 0.11]}>
-            <sphereGeometry args={[0.025, 8, 8]} />
-            <meshStandardMaterial
-              color={roleColor}
-              roughness={0.1}
-              emissive={roleColor}
-              emissiveIntensity={isWorking || isCompleted ? 1.0 : 0.35}
-            />
-          </mesh>
-          <mesh position={[0.04, 0.02, 0.11]}>
-            <sphereGeometry args={[0.025, 8, 8]} />
-            <meshStandardMaterial
-              color={roleColor}
-              roughness={0.1}
-              emissive={roleColor}
-              emissiveIntensity={isWorking || isCompleted ? 1.0 : 0.35}
-            />
-          </mesh>
-
-          {/* Status marker above head */}
-          <StatusMarker
-            status={status}
-            position={[0, 0.2, 0]}
-          />
-        </group>
-
-        {/* Arms */}
-        <mesh
-          position={[-0.25, -0.05, 0]}
-          rotation={[0, 0, isWorking ? Math.sin(Date.now() * 0.005) * 0.25 + 0.15 : 0.1]}
-          castShadow
-        >
-          <boxGeometry args={[0.09, 0.38, 0.09]} />
-          <meshStandardMaterial color={bodyColor} roughness={0.5} />
-        </mesh>
-        <mesh
-          position={[0.25, -0.05, 0]}
-          rotation={[0, 0, isWorking ? Math.sin(Date.now() * 0.005 + 1.5) * 0.25 - 0.15 : -0.1]}
-          castShadow
-        >
-          <boxGeometry args={[0.09, 0.38, 0.09]} />
-          <meshStandardMaterial color={bodyColor} roughness={0.5} />
-        </mesh>
+    <group ref={groupRef} position={position} rotation={[0, deskRotation, 0]}>
+      <group ref={pulseRef}>
+        {style.silhouette === 'lobster-command-pod' ? (
+          <LobsterCommandPod style={style} statusColor={statusColor} pulseScale={1.0} />
+        ) : (
+          <AssistantPod style={style} statusColor={statusColor} pulseScale={1.0} />
+        )}
       </group>
 
-      {/* Legs — hidden when sitting */}
-      {showLegs && (
-        <>
-          <mesh position={[-0.07, legY, 0]} castShadow>
-            <boxGeometry args={[0.11, legLength, 0.11]} />
-            <meshStandardMaterial color="#7a7a88" roughness={0.5} />
-          </mesh>
-          <mesh position={[0.07, legY, 0]} castShadow>
-            <boxGeometry args={[0.11, legLength, 0.11]} />
-            <meshStandardMaterial color="#7a7a88" roughness={0.5} />
-          </mesh>
-        </>
+      {/* Selection ring at base */}
+      {selected && (
+        <mesh ref={ringRef} position={[0, 0.04, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.52, 0.035, 8, 48]} />
+          <meshBasicMaterial color={style.accent} transparent opacity={0.6} />
+        </mesh>
       )}
 
-      {/* Sitting legs */}
-      {isSitting && (
-        <>
-          <mesh position={[-0.1, 0.15, 0.08]} rotation={[0.5, 0, 0]} castShadow>
-            <boxGeometry args={[0.1, 0.2, 0.1]} />
-            <meshStandardMaterial color="#7a7a88" roughness={0.5} />
-          </mesh>
-          <mesh position={[0.1, 0.15, 0.08]} rotation={[0.5, 0, 0]} castShadow>
-            <boxGeometry args={[0.1, 0.2, 0.1]} />
-            <meshStandardMaterial color="#7a7a88" roughness={0.5} />
-          </mesh>
-        </>
-      )}
-
-      {/* Click target */}
+      {/* Click target (invisible) */}
       <mesh
         position={[0, 0.7, 0]}
         onClick={(e) => {
@@ -191,53 +96,9 @@ export function AgentCharacter({ agentId, position, deskRotation = 0 }: AgentCha
           selectAgent(agent.id);
         }}
       >
-        <boxGeometry args={[0.6, 1.3, 0.5]} />
+        <boxGeometry args={[0.7, 1.4, 0.6]} />
         <meshStandardMaterial color="#ffffff" visible={false} />
       </mesh>
     </group>
-  );
-}
-
-const STATUS_CONFIG: Record<string, { color: string; scale: number; pulse: boolean } | null> = {
-  blocked: { color: '#ff3366', scale: 1.2, pulse: true },
-  failed: { color: '#ff1144', scale: 1.35, pulse: true },
-  waiting_input: { color: '#f0a500', scale: 1.1, pulse: true },
-  approval_required: { color: '#ffb84d', scale: 1.15, pulse: true },
-  completed: { color: '#00e676', scale: 1.0, pulse: false },
-  resting: { color: '#7ce3aa', scale: 0.75, pulse: false },
-};
-
-function StatusMarker({
-  status,
-  position,
-}: {
-  status: string;
-  position: [number, number, number];
-}) {
-  const ref = useRef<THREE.Mesh>(null);
-  const config = STATUS_CONFIG[status];
-
-  useFrame(() => {
-    if (!ref.current || !config) return;
-    if (config.pulse) {
-      ref.current.scale.setScalar(config.scale + Math.abs(Math.sin(Date.now() * 0.006)) * 0.3);
-      const mat = ref.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.6 + Math.abs(Math.sin(Date.now() * 0.005)) * 0.4;
-    } else if (status === 'completed') {
-      const mat = ref.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.5 + Math.sin(Date.now() * 0.002) * 0.15;
-    } else if (status === 'resting') {
-      const mat = ref.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.3 + Math.sin(Date.now() * 0.003) * 0.1;
-    }
-  });
-
-  if (!config) return null;
-
-  return (
-    <mesh ref={ref} position={position}>
-      <ringGeometry args={[0.08, 0.13, 16]} />
-      <meshBasicMaterial color={config.color} transparent opacity={0.7} side={THREE.DoubleSide} />
-    </mesh>
   );
 }

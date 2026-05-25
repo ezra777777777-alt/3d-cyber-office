@@ -225,6 +225,17 @@ Normalized `OfficeEvent`:
 }
 ```
 
+## Real Runtime Boundary
+
+The current guarded placeholder (`guarded_real` mode) refuses to plan or execute missions, directing users to configure an external runtime. The next implementation path is documented in:
+
+- **[runtime-integration-options.md](./runtime-integration-options.md)** — 6 candidate approaches compared
+- **[runtime-integration-decision.md](./runtime-integration-decision.md)** — ADR with recommended path
+- **[runtime-security-checklist.md](./runtime-security-checklist.md)** — Credential, file, command, network, and event safety requirements
+- **[local-runtime-protocol-sketch.md](./local-runtime-protocol-sketch.md)** — Protocol message format draft
+
+The adapter contract in this document remains the boundary all external runtimes must satisfy.
+
 ## First Connected Slice
 
 The first real runtime milestone should only prove:

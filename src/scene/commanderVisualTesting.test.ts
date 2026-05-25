@@ -34,4 +34,13 @@ describe('Commander visual scene metadata', () => {
       expect(getDistanceBetweenDesks(commander!, target)).toBeLessThanOrEqual(14);
     }
   });
+
+  it('keeps commander visually stronger than individual workers', () => {
+    const commander = getCommanderFocalDesk(defaultLayout);
+    const workers = getCommanderWorkerDeskTargets(defaultLayout);
+    expect(commander).toBeDefined();
+    expect(workers.length).toBeGreaterThanOrEqual(3);
+    expect(Math.abs(commander!.position[0])).toBeLessThanOrEqual(0.8);
+    expect(commander!.position[2]).toBeLessThanOrEqual(-2.8);
+  });
 });

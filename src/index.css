@@ -66,9 +66,10 @@
     @apply cyber-btn bg-cyber-accent/20 border-cyber-accent;
   }
 
-  /* Scene shell: stable full-height canvas */
+  /* Scene shell: stable full-height canvas with visible fallback */
   .office-canvas-wrapper {
     @apply w-full h-full relative overflow-hidden;
+    background: #e7f4ff;
   }
 
   .office-canvas-wrapper canvas {
@@ -82,6 +83,80 @@
 
   .office-hud-overlay > * {
     pointer-events: auto;
+  }
+
+  /* Office presentation layer — safe-zone overlays */
+  .office-stage {
+    min-height: 0;
+    background: #e7f4ff;
+  }
+
+  .office-presentation-layer {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+  }
+
+  .office-top-safe-zone,
+  .office-bottom-safe-zone {
+    pointer-events: none;
+    position: absolute;
+    left: clamp(12px, 2vw, 24px);
+    right: clamp(12px, 2vw, 24px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .office-top-safe-zone {
+    top: 12px;
+  }
+
+  .office-bottom-safe-zone {
+    bottom: 12px;
+  }
+
+  .office-top-safe-zone > *,
+  .office-bottom-safe-zone > * {
+    pointer-events: auto;
+  }
+
+  .office-hud-strip {
+    min-height: 4px;
+  }
+
+  .office-layer-side {
+    position: absolute;
+    right: 12px;
+    top: 56px;
+    max-height: calc(100% - 164px);
+    overflow: auto;
+    z-index: 28;
+    pointer-events: auto;
+  }
+
+  @media (max-width: 640px) {
+    .office-top-safe-zone {
+      top: 8px;
+      left: 8px;
+      right: 8px;
+    }
+
+    .office-bottom-safe-zone {
+      bottom: 8px;
+      left: 8px;
+      right: 8px;
+      align-items: flex-end;
+    }
+
+    .office-layer-side {
+      right: 8px;
+      left: 8px;
+      top: 72px;
+      max-height: calc(100% - 160px);
+    }
   }
 
   /* Narrow screen responsive overrides */
@@ -113,6 +188,16 @@
     }
     .cyber-btn {
       @apply text-[10px] px-2 py-1;
+    }
+
+    .mobile-nav-scroll {
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .mobile-nav-scroll::-webkit-scrollbar {
+      display: none;
     }
   }
 
@@ -203,6 +288,65 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  .commander-narrative {
+    background: rgb(255 184 77 / 0.06);
+    border: 1px solid rgb(255 184 77 / 0.18);
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .commander-narrative strong {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #ffd27a;
+    margin-bottom: 0.15rem;
+  }
+  .commander-narrative span {
+    font-size: 0.68rem;
+    color: rgb(180 190 210);
+    line-height: 1.4;
+  }
+  .commander-narrative-idle {
+    background: rgb(0 240 255 / 0.05);
+    border-color: rgb(0 240 255 / 0.15);
+  }
+  .commander-narrative-idle strong {
+    color: #00dff6;
+  }
+  .commander-narrative-approval {
+    background: rgb(255 184 77 / 0.1);
+    border-color: rgb(255 184 77 / 0.3);
+    animation: commander-pulse-border 2s ease-in-out infinite;
+  }
+  .commander-narrative-approval strong {
+    color: #ffb84d;
+  }
+  .commander-narrative-working {
+    background: rgb(0 223 246 / 0.07);
+    border-color: rgb(0 223 246 / 0.2);
+    animation: commander-pulse-border 3s ease-in-out infinite;
+  }
+  .commander-narrative-blocked {
+    background: rgb(255 51 102 / 0.06);
+    border-color: rgb(255 51 102 / 0.18);
+  }
+  .commander-narrative-blocked strong {
+    color: #ff6699;
+  }
+  .commander-narrative-completed {
+    background: rgb(0 230 118 / 0.06);
+    border-color: rgb(0 230 118 / 0.18);
+  }
+  .commander-narrative-completed strong {
+    color: #00e676;
+  }
+
+  @keyframes commander-pulse-border {
+    0%, 100% { border-color: rgb(255 184 77 / 0.2); }
+    50% { border-color: rgb(255 184 77 / 0.45); }
   }
 
   .commander-section {

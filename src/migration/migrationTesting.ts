@@ -85,7 +85,7 @@ export function getImportPlan(bundle: MigrationBundle): MigrationImportPlan {
     .filter((section) => section.included && MIGRATION_STORAGE_KEYS.includes(section.key))
     .map((section) => ({
       key: section.key,
-      serializedValue: JSON.stringify(section.value),
+      serializedValue: JSON.stringify(sanitizeSectionValue(section.key, section.value)),
     }));
 
   return {
@@ -95,6 +95,26 @@ export function getImportPlan(bundle: MigrationBundle): MigrationImportPlan {
     writes,
     bundle,
   };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function sanitizeSectionValue(key: MigrationStorageKey, value: unknown): unknown {
+  if (key !== 'cyber-office-ui') return value;
+  if (!isRecord(value)) return value;
+
+  const next: Record<string, unknown> = { ...value };
+  delete next.commanderOpen;
+
+  if (isRecord(next.state)) {
+    const state = { ...next.state };
+    delete state.commanderOpen;
+    next.state = state;
+  }
+
+  return next;
 }
 
 export interface RestoreChecklistItem {

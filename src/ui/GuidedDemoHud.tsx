@@ -11,7 +11,7 @@ export function GuidedDemoHud() {
 
   return (
     <aside className="guided-demo-hud pointer-events-none">
-      <div className="guided-demo-kicker">{demoPaused ? '导览已暂停' : '完整导览'}</div>
+      <div className="guided-demo-kicker">{demoPaused ? '导览已暂停' : '视频复刻导览'}</div>
       <h2>{title}</h2>
       {body && <p>{body}</p>}
       <div className="guided-demo-progress" aria-label="导览进度">

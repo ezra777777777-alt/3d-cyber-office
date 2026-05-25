@@ -1,7 +1,9 @@
 import { useCommanderStore } from '@/store/commanderStore';
 import { useUIStore } from '@/store/uiStore';
 import { buildCommanderVisualState } from '@/commander/commanderVisualState';
+import { buildCommanderExperienceState } from '@/commander/commanderExperience';
 import { CommanderComposer } from './CommanderComposer';
+import { CommanderNarrativeStrip } from './CommanderNarrativeStrip';
 import { RealModeNotice } from './RealModeNotice';
 import { MissionGraph } from './MissionGraph';
 import { WorkerRoster } from './WorkerRoster';
@@ -18,8 +20,10 @@ export function CommanderDock() {
   );
   const workers = useCommanderStore((state) => state.workers);
   const approvals = useCommanderStore((state) => state.approvals);
+  const artifacts = useCommanderStore((state) => state.artifacts);
 
   const visualState = buildCommanderVisualState(mission, approvals, workers);
+  const experienceState = buildCommanderExperienceState(mission, approvals, artifacts);
 
   return (
     <aside className={`commander-dock commander-tone-${visualState.tone} ${commanderOpen ? 'is-open' : 'is-collapsed'}`}>
@@ -40,6 +44,7 @@ export function CommanderDock() {
             <span className="commander-hero-status">{visualState.missionTitle}</span>
           </div>
           <CommanderComposer />
+          <CommanderNarrativeStrip state={experienceState} />
           <RealModeNotice />
           {mission && (
             <>

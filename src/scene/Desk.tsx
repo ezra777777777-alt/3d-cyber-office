@@ -3,7 +3,9 @@ import * as THREE from 'three';
 import { useOfficeStore } from '@/store/officeStore';
 import { useUIStore } from '@/store/uiStore';
 import { Chair } from './Chair';
+import { DeskScreenContent } from './DeskScreenContent';
 import { brightOfficeTheme } from './sceneVisualTheme';
+import { getVisualDensityPreset } from './visualDensityConfig';
 
 interface DeskProps {
   deskId: string;
@@ -20,6 +22,10 @@ export function Desk({ deskId, position, rotation = 0, label, isCommander }: Des
   const task = useOfficeStore((s) => (agent?.currentTaskId ? s.getTask(agent.currentTaskId) : undefined));
   const selectedAgentId = useUIStore((s) => s.selectedAgentId);
   const selectAgent = useUIStore((s) => s.selectAgent);
+  const visualMode = useUIStore((s) => s.visualMode ?? 'normal');
+
+  const density = getVisualDensityPreset(visualMode);
+  const showDeskProps = density.showDeskProps && density.deskPropsPerDesk > 0;
 
   const isSelected = agent && agent.id === selectedAgentId;
   const isActive = task?.status === 'running';
@@ -62,6 +68,15 @@ export function Desk({ deskId, position, rotation = 0, label, isCommander }: Des
         <meshStandardMaterial color={screenColor} roughness={0.15} emissive={screenEmissive} emissiveIntensity={isActive ? 0.5 : 0.08} />
       </mesh>
 
+      {/* Screen content */}
+      <DeskScreenContent
+        status={task?.status ?? null}
+        role={agent?.role ?? null}
+        label={label}
+        taskTitle={task?.title ?? null}
+        density={visualMode}
+      />
+
       {/* Monitor stand base */}
       <mesh position={[0, 0.83, -0.4]} castShadow>
         <boxGeometry args={[0.35, 0.06, 0.25]} />
@@ -73,27 +88,39 @@ export function Desk({ deskId, position, rotation = 0, label, isCommander }: Des
         <meshStandardMaterial color={brightOfficeTheme.deskLeg} roughness={0.2} metalness={0.8} />
       </mesh>
 
-      {/* Desktop props */}
-      {/* Keyboard */}
-      <mesh position={[0, 0.81, 0.18]} castShadow>
-        <boxGeometry args={[0.5, 0.025, 0.16]} />
-        <meshStandardMaterial color="#4a4a55" roughness={0.6} />
-      </mesh>
-      {/* Coffee mug */}
-      <mesh position={[0.6, 0.81, -0.05]} castShadow>
-        <cylinderGeometry args={[0.06, 0.055, 0.1, 12]} />
-        <meshStandardMaterial color="#cc9966" roughness={0.4} />
-      </mesh>
-      {/* Mug handle */}
-      <mesh position={[0.66, 0.81, -0.03]}>
-        <torusGeometry args={[0.035, 0.012, 6, 8, Math.PI]} />
-        <meshStandardMaterial color="#cc9966" roughness={0.4} />
-      </mesh>
-      {/* Small file block */}
-      <mesh position={[-0.55, 0.81, -0.15]} castShadow>
-        <boxGeometry args={[0.15, 0.05, 0.22]} />
-        <meshStandardMaterial color="#d0d0d8" roughness={0.7} />
-      </mesh>
+      {/* Simple document block — one per desk at normal density */}
+      {visualMode !== 'low' && visualMode !== 'showcase' && (
+        <mesh position={[0.62, 0.81, 0.12]} castShadow>
+          <boxGeometry args={[0.28, 0.04, 0.18]} />
+          <meshStandardMaterial color="#dfe8f1" roughness={0.68} />
+        </mesh>
+      )}
+
+      {/* Full desk props — only in showcase mode */}
+      {visualMode === 'showcase' && showDeskProps && (
+        <>
+          {/* Keyboard */}
+          <mesh position={[0, 0.81, 0.18]} castShadow>
+            <boxGeometry args={[0.5, 0.025, 0.16]} />
+            <meshStandardMaterial color="#4a4a55" roughness={0.6} />
+          </mesh>
+          {/* Coffee mug */}
+          <mesh position={[0.6, 0.81, -0.05]} castShadow>
+            <cylinderGeometry args={[0.06, 0.055, 0.1, 12]} />
+            <meshStandardMaterial color="#cc9966" roughness={0.4} />
+          </mesh>
+          {/* Mug handle */}
+          <mesh position={[0.66, 0.81, -0.03]}>
+            <torusGeometry args={[0.035, 0.012, 6, 8, Math.PI]} />
+            <meshStandardMaterial color="#cc9966" roughness={0.4} />
+          </mesh>
+          {/* Small file block */}
+          <mesh position={[-0.55, 0.81, -0.15]} castShadow>
+            <boxGeometry args={[0.15, 0.05, 0.22]} />
+            <meshStandardMaterial color="#d0d0d8" roughness={0.7} />
+          </mesh>
+        </>
+      )}
 
       {/* Chair */}
       <Chair />
