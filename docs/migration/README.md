@@ -23,3 +23,12 @@
 - `dist/`
 
 换电脑后，请在新的安全 Runtime 环境里重新配置模型供应商凭据。
+
+## Runtime History
+
+Browser state is still moved through the Migration module. Runtime mission history is local file-system state:
+
+- `.local-runtime/missions`
+- `.local-runtime/artifacts`
+
+Do not copy `.env`, API keys, tokens, or password files when moving runtime history.

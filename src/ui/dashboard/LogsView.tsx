@@ -61,6 +61,8 @@ export function LogsView() {
         taskId: evt.taskId,
         agentId: evt.agentId,
         artifactId: evt.artifactId ?? null,
+        missionId: evt.missionId ?? null,
+        approvalId: evt.approvalId ?? null,
         source: evt.source ?? null,
       })),
     [events],
@@ -151,6 +153,15 @@ export function LogsView() {
                   onClick={(e) => { e.stopPropagation(); setActiveModule('files'); setSelectedArtifactId(row.artifactId!); }}
                 >
                   查看产物
+                </button>
+              )}
+              {row.missionId && (
+                <button
+                  className="text-[10px] px-1.5 py-0.5 rounded border border-cyber-border text-gray-400 hover:text-white"
+                  onClick={(e) => { e.stopPropagation(); setActiveModule('history'); }}
+                  title={row.approvalId ? `Approval ${row.approvalId}` : row.missionId}
+                >
+                  查看历史
                 </button>
               )}
             </div>

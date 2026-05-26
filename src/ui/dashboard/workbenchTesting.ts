@@ -23,6 +23,8 @@ export interface EventRowSearchItem {
   taskId?: string | null;
   agentId?: string | null;
   artifactId?: string | null;
+  missionId?: string | null;
+  approvalId?: string | null;
   source?: string | null;
 }
 

@@ -154,3 +154,12 @@ test('tool registry lists workspace files', async () => {
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test('tool registry exposes metadata for worker prompts', () => {
+  const tools = createToolRegistry({ workspaceRoot: process.cwd() });
+  const metadata = tools.listTools();
+
+  assert.ok(metadata.some((tool) => tool.name === 'workspace.read_file' && tool.risk === 'low'));
+  assert.ok(metadata.some((tool) => tool.name === 'command.run' && tool.risk === 'high'));
+  assert.equal(metadata.every((tool) => typeof tool.description === 'string'), true);
+});

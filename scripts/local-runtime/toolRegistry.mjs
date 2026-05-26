@@ -12,6 +12,15 @@ const ALLOWLISTED_COMMANDS = new Set([
   'npm.cmd run runtime:test',
 ]);
 
+const TOOL_METADATA = [
+  { name: 'workspace.list_files', risk: 'low', description: 'List files under the workspace root.' },
+  { name: 'workspace.read_file', risk: 'low', description: 'Read one UTF-8 file under the workspace root.' },
+  { name: 'workspace.search_text', risk: 'low', description: 'Search for exact text in workspace files.' },
+  { name: 'artifact.write', risk: 'low', description: 'Write a markdown artifact under .local-runtime/artifacts.' },
+  { name: 'workspace.write_file', risk: 'high', description: 'Write a UTF-8 file under the workspace root.' },
+  { name: 'command.run', risk: 'high', description: 'Run an allowlisted project command.' },
+];
+
 async function listFilesRecursive(root, dir, limit, collected = []) {
   if (collected.length >= limit) return collected;
   const entries = await readdir(dir, { withFileTypes: true });
@@ -116,5 +125,6 @@ export function createToolRegistry(options) {
   return {
     policy,
     executeApproved,
+    listTools: () => TOOL_METADATA.map((tool) => ({ ...tool })),
   };
 }

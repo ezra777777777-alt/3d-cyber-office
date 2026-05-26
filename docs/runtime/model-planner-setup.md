@@ -11,6 +11,14 @@ The local runtime can use a real model to turn a Commander goal into structured 
 - Migration export never includes keys.
 - If no provider is configured, the runtime falls back to deterministic mock planning.
 
+## Planner vs Worker Model Use
+
+The planner turns a Commander goal into Research / Build / Review tasks.
+
+The worker model turns one assigned task plus bounded workspace context into a structured worker decision.
+
+Both use the local runtime environment. The browser never receives provider keys.
+
 ## Mock Mode
 
 ```powershell

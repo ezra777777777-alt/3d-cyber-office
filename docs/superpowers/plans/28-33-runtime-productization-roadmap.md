@@ -241,6 +241,8 @@ The current local runtime has the right shape, but much of the worker output is 
 
 ## 9. Plan 31 Outline: Artifact Center and Mission Replay
 
+**Detailed plan:** `docs/superpowers/plans/31-artifact-center-and-mission-replay.md`
+
 **Primary goal:** Make completed work inspectable after the moment has passed.
 
 **Problem to solve:**
@@ -412,4 +414,4 @@ Execute in strict order:
 5. Write and execute detailed Plan 32.
 6. Write and execute detailed Plan 33.
 
-Do not write all implementation-level details for Plans 29-33 at once. The right level now is this roadmap. Each later plan should be written after the previous plan lands, because the file paths, UI shape, and runtime contracts will change.
+Plans 29-31 now have detailed implementation documents. Keep writing Plans 32-33 only after the previous plan lands and is verified, because file paths, UI shape, runtime contracts, and visual priorities are still changing.

@@ -37,6 +37,8 @@
 - [ ] Plan 26 Safe Tool Execution: low-risk reads/artifacts work, high-risk writes/commands pause for approval, path traversal is blocked, allowlisted commands only.
 - [ ] Plan 27 Multi-Agent Closed Loop: mission engine runs tasks in dependency order, workers produce real artifacts under .local-runtime/, approval gates pause missions, completed missions show summary.
 - [ ] Plan 28 Runtime Usability and Closed-Loop Hardening: /health includes runtime identity (buildId, pid, sourceSignature), Gateway shows stale-process warning, high-risk builder tasks trigger default approval gate before model runs, mission_completed replaces adapter_error for summary events, ApprovalInbox has pending/error states, dead code removed, .local-runtime/ in .gitignore, E2E script (`npm run runtime:e2e`) verifies full flow.
+- [ ] Plan 30 Real AI Worker Capability: workers use bounded workspace context, schema-validated output, prior artifact handoff, and approval-gated writes/commands.
+- [ ] Plan 31 Artifact Center and Mission Replay: durable mission journal, history API, History module, artifact preview, Files/Logs/Commander deep links, and migration notes verified.
 - [ ] Plan 29 启动体验：`npm.cmd run doctor` 能诊断项目根目录、依赖、端口和 Runtime 健康。
 - [ ] Plan 29 一键启动：`npm.cmd run dev:all` 能同时启动 Runtime 和 Vite。
 - [ ] Plan 29 迁移文档：Windows/Windows、Windows/macOS、troubleshooting 均为可读中文且命令与实际 scripts 一致。

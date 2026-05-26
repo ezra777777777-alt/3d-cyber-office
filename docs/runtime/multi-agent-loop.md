@@ -17,6 +17,19 @@
 6. Risky tools pause for approval — mission engine blocks until resolved.
 7. On completion, `runtime.mission_completed` is emitted with task/artifact summary.
 
+## Worker Capability
+
+Workers now receive:
+
+- the mission
+- the current task
+- prior dependency artifacts
+- a bounded workspace context pack
+- allowed tool metadata
+- a strict JSON output contract
+
+This means the loop is no longer only a timer/demo sequence. The Researcher can ground output in project files, the Builder can request approved writes, and the Reviewer can request approved checks.
+
 ## Runtime Identity
 
 Each runtime instance exposes a health identity (`GET /health`) including:

@@ -9,7 +9,14 @@ export function createMissionEngine(options) {
   const emit = options.emit;
   const workspaceRoot = options.workspaceRoot || process.cwd();
   const tools = options.tools || createToolRegistry({ workspaceRoot });
-  const workerEngine = options.workerEngine || createWorkerEngine({ workspaceRoot });
+  const workerEngine =
+    options.workerEngine ||
+    createWorkerEngine({ workspaceRoot, env: options.env, fetcher: options.fetcher });
+  const artifactRecords = new Map();
+  const onMissionSnapshot =
+    typeof options.onMissionSnapshot === 'function' ? options.onMissionSnapshot : null;
+  const onArtifactCreated =
+    typeof options.onArtifactCreated === 'function' ? options.onArtifactCreated : null;
 
   function officeTaskId(missionId, taskId) {
     return `runtime-${missionId}-${taskId}`;
@@ -21,8 +28,26 @@ export function createMissionEngine(options) {
       missionId,
       taskId: officeTaskId(missionId, task.id),
       workerId,
-      payload: { ...payload, missionTaskId: task.id, title: task.title, summary: task.summary },
+      payload: { missionTaskId: task.id, title: task.title, summary: task.summary, ...payload },
     });
+  }
+
+  function notifyMissionSnapshot(state) {
+    if (!onMissionSnapshot) return;
+    try {
+      onMissionSnapshot(state.snapshot());
+    } catch {
+      // Journal hooks must not break mission execution.
+    }
+  }
+
+  function notifyArtifactCreated(artifact) {
+    if (!onArtifactCreated) return;
+    try {
+      onArtifactCreated(artifact);
+    } catch {
+      // Journal hooks must not break mission execution.
+    }
   }
 
   function emitSummaryIfCompleted(state) {
@@ -47,10 +72,18 @@ export function createMissionEngine(options) {
     });
   }
 
+  function getPriorArtifactsForTask(state, task) {
+    const dependencyIds = new Set(task.dependencyIds || []);
+    return [...artifactRecords.values()].filter(
+      (artifact) => artifact.missionId === state.mission.id && dependencyIds.has(artifact.taskId),
+    );
+  }
+
   async function runOneTask(state, task) {
     const missionId = state.mission.id;
     const worker = getWorkerForRole(task.role);
     state.setTaskStatus(task.id, 'running');
+    notifyMissionSnapshot(state);
     emitTask('runtime.task_assigned', missionId, task, worker.id);
     emitTask('runtime.task_started', missionId, task, worker.id, {
       message: `${task.title} 已开始`,
@@ -60,12 +93,13 @@ export function createMissionEngine(options) {
       mission: state.mission,
       task,
       officeTaskId: officeTaskId(missionId, task.id),
-      artifacts: [],
+      artifacts: getPriorArtifactsForTask(state, task),
     });
 
     if (result.status === 'approval_required') {
       const approvalId = `approval-${missionId}-${task.id}-${Date.now()}`;
       state.setTaskStatus(task.id, 'waiting_input');
+      notifyMissionSnapshot(state);
       pendingApprovals.set(approvalId, {
         state,
         task,
@@ -87,17 +121,31 @@ export function createMissionEngine(options) {
     }
 
     if (result.artifact) {
+      const artifactRecord = {
+        ...result.artifact,
+        missionId,
+        taskId: task.id,
+        workerId: worker.id,
+        summary: result.summary,
+      };
+      artifactRecords.set(result.artifact.artifactId, artifactRecord);
+      notifyArtifactCreated(artifactRecord);
       state.addArtifact(task.id, result.artifact.artifactId);
+      notifyMissionSnapshot(state);
       emitTask('runtime.artifact_created', missionId, task, worker.id, {
         artifactId: result.artifact.artifactId,
         title: result.artifact.title,
         kind: result.artifact.kind,
         path: result.artifact.path,
         summary: result.summary,
+        createdByWorkerId: result.artifact.createdByWorkerId || worker.id,
+        workspaceBacked: result.artifact.workspaceBacked,
+        previewable: result.artifact.previewable,
       });
     }
 
     state.setTaskStatus(task.id, 'completed');
+    notifyMissionSnapshot(state);
     emitTask('runtime.task_completed', missionId, task, worker.id, {
       outputSummary: result.summary,
     });
@@ -122,12 +170,14 @@ export function createMissionEngine(options) {
     }
 
     emitSummaryIfCompleted(state);
+    notifyMissionSnapshot(state);
     return state.snapshot();
   }
 
   async function startMission(plan) {
     const state = createMissionState(plan);
     missions.set(plan.missionId, state);
+    notifyMissionSnapshot(state);
 
     for (const task of plan.tasks) {
       const worker = getWorkerForRole(task.role);
@@ -161,6 +211,7 @@ export function createMissionEngine(options) {
 
     if (resolution !== 'approved') {
       state.setTaskStatus(task.id, 'blocked');
+      notifyMissionSnapshot(state);
       emitTask('runtime.task_failed', missionId, task, worker.id, {
         errorSummary: note || 'User rejected approval request.',
       });
@@ -190,11 +241,15 @@ export function createMissionEngine(options) {
     });
 
     state.setTaskStatus(task.id, 'completed');
+    notifyMissionSnapshot(state);
     emitTask('runtime.task_completed', missionId, task, worker.id, {
       outputSummary: 'Approved action completed.',
     });
 
-    state.mission.status = 'running';
+    if (state.mission.status !== 'completed') {
+      state.mission.status = 'running';
+      notifyMissionSnapshot(state);
+    }
     return { ok: true, snapshot: await drainReadyTasks(state) };
   }
 

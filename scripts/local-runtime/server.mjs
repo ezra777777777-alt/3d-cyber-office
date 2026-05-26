@@ -5,6 +5,7 @@ import { createApprovalQueue } from './approvalQueue.mjs';
 import { createToolRegistry } from './toolRegistry.mjs';
 import { createMissionEngine } from './missionEngine.mjs';
 import { createRuntimeIdentity } from './runtimeIdentity.mjs';
+import { createMissionJournal } from './missionJournal.mjs';
 
 const HOST = '127.0.0.1';
 const PORT = Number(process.env.LOCAL_RUNTIME_PORT || 8765);
@@ -18,6 +19,7 @@ const runtimeIdentity = createRuntimeIdentity({ startedAt });
 const clients = new Set();
 const approvalQueue = createApprovalQueue();
 const tools = createToolRegistry({ workspaceRoot: process.cwd() });
+const missionJournal = createMissionJournal({ workspaceRoot: process.cwd() });
 
 function now() {
   return new Date().toISOString();
@@ -77,6 +79,10 @@ function broadcast(type, partial) {
     payload: partial.payload || {},
   };
 
+  void missionJournal.appendEvent(message).catch((error) => {
+    console.error('[local-runtime] mission journal append failed:', error);
+  });
+
   for (const client of clients) sendSse(client, message);
   return message;
 }
@@ -102,7 +108,51 @@ function emitApprovalRequest(approval) {
 const missionEngine = createMissionEngine({
   workspaceRoot: process.cwd(),
   emit: broadcast,
+  env: runtimeEnv,
+  onMissionSnapshot: (snapshot) => {
+    void missionJournal.writeMissionSnapshot(snapshot).catch((error) => {
+      console.error('[local-runtime] mission journal snapshot failed:', error);
+    });
+  },
+  onArtifactCreated: (artifact) => {
+    void missionJournal.recordArtifact(artifact).catch((error) => {
+      console.error('[local-runtime] mission journal artifact failed:', error);
+    });
+  },
 });
+
+function missionListItemFromSnapshot(snapshot) {
+  const tasks = Array.isArray(snapshot?.tasks) ? snapshot.tasks : [];
+  const artifactCount = tasks.reduce(
+    (sum, task) => sum + (Array.isArray(task.artifactIds) ? task.artifactIds.length : 0),
+    0,
+  );
+  return {
+    missionId: snapshot.mission.id,
+    title: snapshot.mission.title || snapshot.mission.id,
+    status: snapshot.mission.status || 'unknown',
+    createdAt: snapshot.mission.startedAt || snapshot.mission.completedAt || startedAt,
+    updatedAt: snapshot.mission.completedAt || new Date().toISOString(),
+    taskCount: tasks.length,
+    completedTaskCount: tasks.filter((task) => task.status === 'completed').length,
+    artifactCount,
+    approvalCount: 0,
+  };
+}
+
+async function listHistoryMissions() {
+  const journalMissions = await missionJournal.listMissions();
+  const byId = new Map(journalMissions.map((mission) => [mission.missionId, mission]));
+  for (const snapshot of missionEngine.listMissions()) {
+    const current = byId.get(snapshot.mission.id);
+    byId.set(snapshot.mission.id, {
+      ...current,
+      ...missionListItemFromSnapshot(snapshot),
+      approvalCount: current?.approvalCount || 0,
+    });
+  }
+  return [...byId.values()].sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+}
 
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
@@ -189,10 +239,80 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (req.method === 'GET' && url.pathname === '/missions') {
+    try {
+      json(res, 200, { ok: true, missions: await listHistoryMissions() });
+    } catch (error) {
+      json(res, 500, {
+        ok: false,
+        error: error instanceof Error ? error.message : 'Mission history failed',
+      });
+    }
+    return;
+  }
+
+  const missionEventsMatch = url.pathname.match(/^\/missions\/([^/]+)\/events$/);
+  if (req.method === 'GET' && missionEventsMatch) {
+    try {
+      const missionId = decodeURIComponent(missionEventsMatch[1]);
+      const requestedLimit = Number(url.searchParams.get('limit') || 500);
+      const limit = Math.min(Math.max(requestedLimit || 500, 0), 1000);
+      json(res, 200, {
+        ok: true,
+        missionId,
+        events: await missionJournal.readMissionEvents(missionId, { limit }),
+      });
+    } catch (error) {
+      json(res, 400, {
+        ok: false,
+        error: error instanceof Error ? error.message : 'Mission events failed',
+      });
+    }
+    return;
+  }
+
+  const missionArtifactsMatch = url.pathname.match(/^\/missions\/([^/]+)\/artifacts$/);
+  if (req.method === 'GET' && missionArtifactsMatch) {
+    try {
+      const missionId = decodeURIComponent(missionArtifactsMatch[1]);
+      json(res, 200, {
+        ok: true,
+        missionId,
+        artifacts: await missionJournal.listMissionArtifacts(missionId),
+      });
+    } catch (error) {
+      json(res, 400, {
+        ok: false,
+        error: error instanceof Error ? error.message : 'Mission artifacts failed',
+      });
+    }
+    return;
+  }
+
+  const artifactContentMatch = url.pathname.match(/^\/missions\/([^/]+)\/artifacts\/([^/]+)$/);
+  if (req.method === 'GET' && artifactContentMatch) {
+    try {
+      const missionId = decodeURIComponent(artifactContentMatch[1]);
+      const artifactId = decodeURIComponent(artifactContentMatch[2]);
+      const result = await missionJournal.readArtifactContent(missionId, artifactId);
+      if (!result) {
+        json(res, 404, { ok: false, error: 'Artifact not found' });
+        return;
+      }
+      json(res, 200, { ok: true, ...result });
+    } catch (error) {
+      json(res, 400, {
+        ok: false,
+        error: error instanceof Error ? error.message : 'Artifact content failed',
+      });
+    }
+    return;
+  }
+
   const missionMatch = url.pathname.match(/^\/missions\/([^/]+)$/);
   if (req.method === 'GET' && missionMatch) {
     const mid = decodeURIComponent(missionMatch[1]);
-    const mission = missionEngine.getMission(mid);
+    const mission = missionEngine.getMission(mid) || (await missionJournal.readMission(mid).catch(() => null));
     if (!mission) {
       json(res, 404, { ok: false, error: 'Mission not found' });
       return;
