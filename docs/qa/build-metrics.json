@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "summary": {
+    "app": {
+      "group": "app",
+      "files": [
+        {
+          "fileName": "assets/index-[hash].js",
+          "kb": 146.95
+        }
+      ],
+      "maxKb": 146.95,
+      "totalKb": 146.95
+    },
+    "css": {
+      "group": "css",
+      "files": [
+        {
+          "fileName": "assets/index-[hash].css",
+          "kb": 35.65
+        }
+      ],
+      "maxKb": 35.65,
+      "totalKb": 35.65
+    },
+    "other": {
+      "group": "other",
+      "files": [
+        {
+          "fileName": "assets/CalendarView-[hash].js",
+          "kb": 5.37
+        },
+        {
+          "fileName": "assets/CronJobsView-[hash].js",
+          "kb": 3.59
+        },
+        {
+          "fileName": "assets/DailyReview-[hash].js",
+          "kb": 6.23
+        },
+        {
+          "fileName": "assets/FilesView-[hash].js",
+          "kb": 4.66
+        },
+        {
+          "fileName": "assets/GatewayStatus-[hash].js",
+          "kb": 8.05
+        },
+        {
+          "fileName": "assets/LogsView-[hash].js",
+          "kb": 4.1
+        },
+        {
+          "fileName": "assets/MigrationView-[hash].js",
+          "kb": 10.19
+        },
+        {
+          "fileName": "assets/MissionHistoryView-[hash].js",
+          "kb": 13.53
+        },
+        {
+          "fileName": "assets/RestView-[hash].js",
+          "kb": 1.73
+        },
+        {
+          "fileName": "assets/TasksView-[hash].js",
+          "kb": 3.9
+        },
+        {
+          "fileName": "assets/WorkbenchHeader-[hash].js",
+          "kb": 4.33
+        }
+      ],
+      "maxKb": 13.53,
+      "totalKb": 65.68
+    },
+    "vendor-3d": {
+      "group": "vendor-3d",
+      "files": [
+        {
+          "fileName": "assets/vendor-3d-[hash].js",
+          "kb": 805.5
+        }
+      ],
+      "maxKb": 805.5,
+      "totalKb": 805.5
+    },
+    "vendor-react": {
+      "group": "vendor-react",
+      "files": [
+        {
+          "fileName": "assets/vendor-react-[hash].js",
+          "kb": 242.28
+        }
+      ],
+      "maxKb": 242.28,
+      "totalKb": 242.28
+    }
+  },
+  "failures": []
+}

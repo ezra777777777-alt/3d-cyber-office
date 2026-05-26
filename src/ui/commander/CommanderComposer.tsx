@@ -4,6 +4,7 @@ import { createMockCommanderPlanner } from '@/ai/mockCommanderPlanner';
 import { createMockWorkerExecutionAdapter } from '@/ai/mockWorkerExecutionAdapter';
 import { createGuardedRealCommanderPlanner } from '@/ai/guardedRealCommanderAdapter';
 import { createLocalRuntimeCommanderPlanner } from '@/ai/localRuntimeCommanderAdapter';
+import { createDemoMission } from '@/data/demoCommander';
 import {
   planMissionWithAdapter,
   setActiveWorkerAdapter,
@@ -60,7 +61,6 @@ export function CommanderComposer() {
         requestedAt: new Date().toISOString(),
       });
 
-      const { createDemoMission } = await import('@/data/demoCommander');
       const mission = createDemoMission(
         result.missionTitle,
         result.missionSummary ?? '',

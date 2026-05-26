@@ -96,3 +96,12 @@
 - [ ] Plan 27 Multi-Agent Closed Loop: mission engine runs tasks in dependency order, workers produce artifacts, approval pauses high-risk actions, completed missions emit summary.
 - [ ] Plan 28 Runtime Usability and Closed-Loop Hardening: /health includes identity fields, stale runtime detection works in Gateway, default approval gate fires for builder+high-risk, mission_completed event maps correctly, ApprovalInbox shows loading/error states, dead code removed, .local-runtime/ gitignored, `npm run runtime:e2e` passes.
 - [ ] Plan 29 Startup and Migration Experience: `doctor` diagnoses project root/deps/ports/runtime, `check:ports` reports port status, `dev:all` starts both services, migration docs are clean Chinese with correct commands.
+
+## Release Candidate Gate
+
+- [x] Startup works through `npm.cmd run dev:all`.
+- [x] Runtime E2E passes.
+- [x] Production preview smoke passes.
+- [x] Release package excludes secrets and generated state.
+- [x] Migration docs distinguish browser state from runtime history/artifacts.
+- [x] Branch is committed and pushed.

@@ -107,6 +107,7 @@ flowchart LR
   P30 --> P31["Plan 31<br/>Artifact center and replay"]
   P31 --> P32["Plan 32<br/>Video-grade visual rebuild V2"]
   P32 --> P33["Plan 33<br/>Performance and release packaging"]
+  P33 --> P331["Plan 33.1<br/>Release closure hotfix"]
   P29 --> P33
 ```
 
@@ -369,6 +370,34 @@ The build succeeds, but `vendor-3d` is large and chunk warnings remain. Startup 
 
 ---
 
+## 11.1 Plan 33.1 Outline: Release Closure Hotfix
+
+**Detailed plan:** `docs/superpowers/plans/33.1-release-closure-hotfix.md`
+
+**Primary goal:** Close the remaining Plan 33 release blockers before calling the local MVP release complete.
+
+**Problem to solve:**
+
+Plan 33 passed local build, package, smoke, runtime, and browser checks, but release closure is not complete because GitHub push failed and repeated `build:metrics` in a temporary clone can dirty `docs/qa/build-metrics.json`.
+
+**Feature requirements:**
+
+- Make `build-metrics.json` deterministic by removing wall-clock timestamps and normalizing Vite hash filenames.
+- Add release metrics tests for hash stability.
+- Update clean-clone instructions to install dependencies before tests.
+- Complete GitHub push or report exact branch/commit/auth blocker.
+- Re-run release gate after the hotfix.
+
+**Acceptance gate:**
+
+- `npm.cmd run release:test` passes.
+- `npm.cmd run build:metrics` can run twice without dirtying `docs/qa/build-metrics.json`.
+- `npm.cmd run runtime:e2e` passes.
+- `npm.cmd run release:smoke` passes.
+- GitHub push succeeds, or the only remaining blocker is reported with branch and commit SHA.
+
+---
+
 ## 12. Cut Line: What Not To Pull Into Plans 28-33
 
 Do not add these into the current MVP phase:
@@ -418,4 +447,4 @@ Execute in strict order:
 5. Write and execute detailed Plan 32.
 6. Write and execute detailed Plan 33.
 
-Plans 29-33 now have detailed implementation documents. Treat this roadmap as the execution record for the local MVP hardening phase; later Plans 34+ should start from the final Plan 33 verification report.
+Plans 29-33.1 now have detailed implementation documents. Treat this roadmap as the execution record for the local MVP hardening phase; later Plans 34+ should start from the final Plan 33.1 verification report.
