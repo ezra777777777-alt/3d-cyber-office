@@ -146,11 +146,27 @@ Every plan should:
 4. Preserve selection context across Office and workbench modules where the current app already supports it.
 5. Keep secrets and runtime-owned state out of ordinary frontend persistence.
 
-## 7. Immediate Next Plan
+## 7. Current Continuation Roadmap
+
+The original five-plan split has been expanded and largely implemented through Plan 27. The current execution spine is now:
+
+`docs/superpowers/plans/28-33-runtime-productization-roadmap.md`
+
+This continuation roadmap aligns the next six practical plans with the original video-replication goal:
+
+| Plan | Current Role | Original Roadmap Alignment |
+| --- | --- | --- |
+| 28 Runtime Usability and Closed-Loop Hardening | Make local Runtime trustworthy, visible, and approval-capable | Runtime Adapter + Commander Workflow |
+| 29 Startup and Migration Experience | Make frontend/runtime startup and cross-machine setup understandable | Persistence and Migration |
+| 30 Real AI Worker Capability | Make workers inspect files, request approvals, and produce useful outputs | Commander Workflow + Runtime Adapter |
+| 31 Artifact Center and Mission Replay | Preserve missions, approvals, tools, artifacts, and summaries as inspectable history | Workbench Fidelity + Persistence |
+| 32 Video-Grade Visual Rebuild V2 | Rebuild the visual layer after workflows stabilize | Office Visual Fidelity |
+| 33 Performance and Release Packaging | Prepare production build, smoke checks, and release shape | Global Verification + Migration |
+
+## 8. Immediate Next Plan
 
 Execute:
 
-`docs/superpowers/plans/01-office-visual-fidelity.md`
+`docs/superpowers/plans/28-runtime-usability-and-closed-loop-hardening.md`
 
-This is the fastest route to make the current prototype look materially closer to the reference video while leaving stable seams for later workbench and runtime plans.
-
+Do this before more visual work. The current product risk is not a missing module; it is that users can connect to stale runtime processes, miss the approval loop, and see completion summaries as error-like events. Plan 28 fixes that trust boundary first.

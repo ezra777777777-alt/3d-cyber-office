@@ -27,7 +27,7 @@ const MigrationView = lazy(() => import('./dashboard/MigrationView').then((m) =>
 import { stopDemoEngine } from '@/demo/demoEngine';
 import { dispatch } from '@/core/event-bus';
 import { createMockRuntimeAdapter } from '@/runtime/mockRuntimeAdapter';
-import { createOpenClawAdapter } from '@/runtime/openClawAdapter';
+import { createLocalRuntimeAdapter } from '@/runtime/localRuntimeAdapter';
 import { useRuntimeStore } from '@/store/runtimeStore';
 import { useDashboardStore } from '@/store/dashboardStore';
 import { runtimeEventToWorkbenchTaskStatus } from './dashboard/workbenchTesting';
@@ -191,7 +191,7 @@ export function AppShell() {
     if (runtimeMode === 'mock') {
       adapter = createMockRuntimeAdapter();
     } else if (runtimeMode === 'connected') {
-      adapter = createOpenClawAdapter({ endpoint: runtimeEndpoint, protocol: 'openclaw', version: '0.4.0' });
+      adapter = createLocalRuntimeAdapter({ endpoint: runtimeEndpoint });
     } else {
       return;
     }

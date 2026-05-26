@@ -30,6 +30,13 @@ export interface VideoFrameAvatarSlot {
   role: 'commander' | 'worker';
 }
 
+export interface VideoFrameAmbientAvatarSlot {
+  id: string;
+  position: [number, number, number];
+  rotationY: number;
+  scale: number;
+}
+
 export const VIDEO_FRAME_PALETTE = {
   background: '#07111f',
   platform: '#f3efe6',
@@ -44,7 +51,7 @@ export const VIDEO_FRAME_PALETTE = {
   lobster: '#f05f4b',
   commanderBody: '#c5643f',
   workerBody: '#222832',
-  workerHead: '#cfa27f',
+  workerHead: '#9a7358',
   chair: '#101319',
   statusCyan: '#25d9ff',
   statusAmber: '#f2b85f',
@@ -89,12 +96,28 @@ export const VIDEO_FRAME_EXPANSION_ZONES = {
   },
 } as const;
 
+export const VIDEO_FRAME_LANDMARKS = {
+  blueInfoBoard: {
+    id: 'blue-info-board',
+    position: [-0.25, 0.92, -3.25] as [number, number, number],
+    size: [1.55, 1.12, 0.08] as [number, number, number],
+  },
+  rearArch: {
+    id: 'rear-green-arch',
+    position: [1.18, 0, -4.86] as [number, number, number],
+    width: 1.18,
+    height: 1.35,
+  },
+} as const;
+
 export const VIDEO_FRAME_AVATAR = {
   headShape: 'box',
   bodyShape: 'box',
-  height: 0.86,
+  height: 0.74,
   chairRequired: true,
   realisticLobsterBodyAllowed: false,
+  groundGlowAllowed: false,
+  paleSkinToneAllowed: false,
 } as const;
 
 export const VIDEO_FRAME_SLOTS = {
@@ -112,6 +135,13 @@ export const VIDEO_FRAME_SLOTS = {
     { id: 'worker-right-back', deskId: 'desk-done', position: [4.9, 0, -2.95] as [number, number, number], rotationY: 0.55, role: 'worker' as const },
   ],
 } as const;
+
+export const VIDEO_FRAME_AMBIENT_AVATARS: VideoFrameAmbientAvatarSlot[] = [
+  { id: 'ambient-far-left', position: [-2.62, 0, -4.33], rotationY: Math.PI, scale: 0.62 },
+  { id: 'ambient-far-mid', position: [-0.9, 0, -4.2], rotationY: Math.PI, scale: 0.6 },
+  { id: 'ambient-right-side', position: [5.25, 0, -3.58], rotationY: 0.54, scale: 0.68 },
+  { id: 'ambient-right-rear', position: [5.85, 0, -3.82], rotationY: 0.72, scale: 0.58 },
+];
 
 export const VIDEO_FRAME_FURNITURE: VideoFrameFurnitureSlot[] = [
   { id: 'commander-desk', kind: 'commanderDesk', assetId: 'mainDesk', position: [2.95, 0, -4.72], rotationY: Math.PI, scale: [1.32, 1.32, 1.32], priority: 'essential' },
@@ -142,6 +172,10 @@ export function getVideoFrameWorkerSlots() {
 
 export function getVideoFrameAvatarSlots() {
   return [VIDEO_FRAME_SLOTS.commander, ...VIDEO_FRAME_SLOTS.workers];
+}
+
+export function getVideoFrameAmbientAvatarSlots() {
+  return [...VIDEO_FRAME_AMBIENT_AVATARS];
 }
 
 export function getVideoFrameFurnitureSlots(mode: 'low' | 'normal' | 'showcase') {

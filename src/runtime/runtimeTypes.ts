@@ -26,7 +26,8 @@ export type RuntimeMessageType =
   | 'runtime.artifact_created'
   | 'runtime.task_completed'
   | 'runtime.task_failed'
-  | 'runtime.adapter_error';
+  | 'runtime.adapter_error'
+  | 'runtime.mission_completed';
 
 export interface RuntimeRawMessage {
   runtimeEventId: string;

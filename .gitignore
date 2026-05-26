@@ -15,3 +15,5 @@ test-results/
 .video-reference-frames/
 .visual-qa-*/
 .codex-video-review/
+.local-runtime/
+.codex-project-skills/

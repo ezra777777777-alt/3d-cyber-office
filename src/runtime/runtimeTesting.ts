@@ -9,6 +9,22 @@ export function redactRuntimePayload(payload: Record<string, unknown>): Record<s
 }
 
 export function detectProtocolCompatibility(protocol: string, version: string): RuntimeCompatibility {
+  if (protocol === 'openclaw-local') {
+    if (!version.startsWith('0.1.')) {
+      return {
+        ok: false,
+        diagnosticKind: 'protocol_mismatch',
+        message: `Expected local runtime 0.1.x, received ${version}`,
+      };
+    }
+
+    return {
+      ok: true,
+      diagnosticKind: 'healthy',
+      message: 'Local runtime protocol is compatible.',
+    };
+  }
+
   if (protocol !== 'openclaw') {
     return {
       ok: false,

@@ -3,6 +3,7 @@ import { useRuntimeStore } from '@/store/runtimeStore';
 import { createMockCommanderPlanner } from '@/ai/mockCommanderPlanner';
 import { createMockWorkerExecutionAdapter } from '@/ai/mockWorkerExecutionAdapter';
 import { createGuardedRealCommanderPlanner } from '@/ai/guardedRealCommanderAdapter';
+import { createLocalRuntimeCommanderPlanner } from '@/ai/localRuntimeCommanderAdapter';
 import {
   planMissionWithAdapter,
   setActiveWorkerAdapter,
@@ -13,8 +14,15 @@ import type { CommanderAdapterMode } from '@/ai/commanderAdapterTypes';
 const MODES: { key: CommanderAdapterMode; label: string }[] = [
   { key: 'demo', label: 'Demo' },
   { key: 'mock_ai', label: 'Mock AI' },
+  { key: 'local_runtime', label: '本地 Runtime' },
   { key: 'guarded_real', label: '真实占位' },
 ];
+
+const WORKER_ID_BY_ROLE: Record<string, string> = {
+  researcher: 'worker-research',
+  builder: 'worker-builder',
+  reviewer: 'worker-review',
+};
 
 export function CommanderComposer() {
   const draft = useCommanderStore((state) => state.draft);
@@ -37,10 +45,13 @@ export function CommanderComposer() {
     setAdapterError(null);
 
     try {
+      const runtimeEndpoint = useRuntimeStore.getState().endpoint;
       const planner =
         adapterMode === 'mock_ai'
           ? createMockCommanderPlanner()
-          : createGuardedRealCommanderPlanner();
+          : adapterMode === 'local_runtime'
+            ? createLocalRuntimeCommanderPlanner({ endpoint: runtimeEndpoint })
+            : createGuardedRealCommanderPlanner();
 
       const result = await planMissionWithAdapter(planner, {
         goal: draft.goal.trim() || '新的 AI 指挥任务',
@@ -49,7 +60,6 @@ export function CommanderComposer() {
         requestedAt: new Date().toISOString(),
       });
 
-      // Create the mission from the planner result
       const { createDemoMission } = await import('@/data/demoCommander');
       const mission = createDemoMission(
         result.missionTitle,
@@ -57,20 +67,18 @@ export function CommanderComposer() {
         draft.constraintsText.split('\n').map((s) => s.trim()).filter(Boolean),
       );
 
-      // Override tasks with planner result
-      const workerIdMap: Record<string, string> = {
-        researcher: 'worker-research',
-        builder: 'worker-builder',
-        reviewer: 'worker-review',
-      };
+      if (result.missionId) {
+        mission.id = result.missionId;
+      }
+
       for (const planned of result.tasks) {
         mission.tasks[planned.id] = {
           id: planned.id,
           title: planned.title,
           summary: planned.summary,
           status: 'planned',
-          workerId: workerIdMap[planned.role] ?? 'worker-research',
-          officeTaskId: `task-${planned.id}`,
+          workerId: WORKER_ID_BY_ROLE[planned.role] ?? 'worker-research',
+          officeTaskId: result.missionId ? `runtime-${result.missionId}-${planned.id}` : `task-${planned.id}`,
           dependencyIds: planned.dependencyIds ?? [],
           expectedArtifactIds: planned.expectedArtifactKinds ?? [],
           risk: planned.risk === 'critical' ? 'high' : planned.risk,
@@ -78,7 +86,7 @@ export function CommanderComposer() {
           artifactIds: [],
         };
       }
-      mission.taskIds = result.tasks.map((t) => t.id);
+      mission.taskIds = result.tasks.map((task) => task.id);
 
       useCommanderStore.setState((state) => ({
         missions: { ...state.missions, [mission.id]: mission },
@@ -86,7 +94,6 @@ export function CommanderComposer() {
         adapterStatus: 'executing',
       }));
 
-      // Start mock worker execution
       if (adapterMode === 'mock_ai') {
         const worker = createMockWorkerExecutionAdapter();
         setActiveWorkerAdapter(worker);
@@ -107,7 +114,6 @@ export function CommanderComposer() {
         <span className="commander-pill">指挥入口</span>
       </header>
 
-      {/* Adapter mode selector */}
       <div className="flex flex-wrap gap-1 mb-3">
         {MODES.map(({ key, label }) => (
           <button
@@ -125,7 +131,9 @@ export function CommanderComposer() {
         <p className="text-xs text-gray-500 mb-2">
           {adapterMode === 'mock_ai'
             ? 'Mock AI 会模拟真实规划和审批，不会执行真实副作用。'
-            : '真实占位模式不会请求 token。真实 AI 接入必须通过外部 Runtime Adapter。'}
+            : adapterMode === 'local_runtime'
+              ? '本地 Runtime 会把目标发送到 localhost 进程，由外部进程回传任务、审批和产物事件。'
+              : '真实占位模式不会请求 token。真实 AI 接入必须通过外部 Runtime Adapter。'}
         </p>
       )}
 
@@ -168,7 +176,7 @@ export function CommanderComposer() {
         onClick={handleCreateMission}
         disabled={adapterStatus === 'planning' || adapterStatus === 'executing'}
       >
-        {adapterStatus === 'planning' ? '规划中……' : adapterStatus === 'executing' ? '执行中……' : '规划任务'}
+        {adapterStatus === 'planning' ? '规划中...' : adapterStatus === 'executing' ? '执行中...' : '规划任务'}
       </button>
     </section>
   );

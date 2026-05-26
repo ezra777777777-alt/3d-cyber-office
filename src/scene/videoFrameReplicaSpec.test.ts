@@ -6,6 +6,7 @@ import {
   VIDEO_FRAME_AVATAR,
   VIDEO_FRAME_SLOTS,
   getVideoFrameWorkerSlots,
+  getVideoFrameAmbientAvatarSlots,
   getVideoFrameFurnitureSlots,
 } from './videoFrameReplicaSpec';
 
@@ -40,6 +41,8 @@ describe('video frame replica spec', () => {
     expect(VIDEO_FRAME_AVATAR.height).toBeLessThanOrEqual(0.88);
     expect(VIDEO_FRAME_AVATAR.chairRequired).toBe(true);
     expect(VIDEO_FRAME_AVATAR.realisticLobsterBodyAllowed).toBe(false);
+    expect(VIDEO_FRAME_AVATAR.groundGlowAllowed).toBe(false);
+    expect(VIDEO_FRAME_AVATAR.paleSkinToneAllowed).toBe(false);
   });
 
   it('places commander and workers in video-like zones', () => {
@@ -62,5 +65,15 @@ describe('video frame replica spec', () => {
     expect(mod.VIDEO_FRAME_EXPANSION_ZONES.leftGarden.position[0]).toBeLessThan(-5);
     expect(mod.VIDEO_FRAME_EXPANSION_ZONES.farWorkCluster.position[2]).toBeLessThan(-4);
     expect(mod.VIDEO_FRAME_EXPANSION_ZONES.rightExtension.position[0]).toBeGreaterThan(5);
+  });
+
+  it('adds distant avatars and visual landmarks so the island feels inhabited', async () => {
+    const mod = await import('./videoFrameReplicaSpec');
+    const ambientAvatars = getVideoFrameAmbientAvatarSlots();
+    expect(ambientAvatars.length).toBeGreaterThanOrEqual(3);
+    expect(ambientAvatars.every((slot) => slot.position[2] < -3.4)).toBe(true);
+    expect(ambientAvatars.every((slot) => slot.scale <= 0.72)).toBe(true);
+    expect(mod.VIDEO_FRAME_LANDMARKS.blueInfoBoard.position[2]).toBeLessThan(-2.7);
+    expect(mod.VIDEO_FRAME_LANDMARKS.rearArch.position[2]).toBeLessThan(-4);
   });
 });

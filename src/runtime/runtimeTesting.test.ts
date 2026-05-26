@@ -51,6 +51,13 @@ describe('runtime normalization', () => {
       diagnosticKind: 'healthy',
     });
   });
+
+  it('accepts compatible local runtime protocol version', () => {
+    expect(detectProtocolCompatibility('openclaw-local', '0.1.0')).toMatchObject({
+      ok: true,
+      diagnosticKind: 'healthy',
+    });
+  });
 });
 
 describe('runtime message ordering', () => {
@@ -75,10 +82,29 @@ describe('normalizeRuntimeEvent edge cases', () => {
   });
 
   it('returns null event for unmapped message type', () => {
-    const msg: RuntimeRawMessage = { ...baseMessage, type: 'runtime.worker_status' as never };
+    const msg: RuntimeRawMessage = { ...baseMessage, type: 'runtime.unmapped_message' as never };
     const result = normalizeRuntimeEvent(msg);
     expect(result.event).toBeNull();
     expect(result.diagnostics.some((d) => d.title === 'Unknown runtime message')).toBe(true);
+  });
+
+  it('maps runtime worker status to agent status change', () => {
+    const msg: RuntimeRawMessage = {
+      ...baseMessage,
+      runtimeEventId: 'rt-worker-status',
+      type: 'runtime.worker_status',
+      workerId: 'worker-builder',
+      taskId: null,
+      payload: { status: 'working' },
+    };
+
+    const result = normalizeRuntimeEvent(msg);
+    expect(result.event).toMatchObject({
+      type: 'agent.status_changed',
+      agentId: 'worker-builder',
+      taskId: null,
+      payload: { status: 'working' },
+    });
   });
 
   it('preserves raw message in normalized result', () => {

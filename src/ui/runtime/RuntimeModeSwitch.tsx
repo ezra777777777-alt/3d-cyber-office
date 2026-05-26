@@ -25,7 +25,10 @@ export function RuntimeModeSwitch() {
           {labelForRuntimeMode(nextMode)}
         </button>
       ))}
-      <span className="text-xs font-medium" style={{ color: status === 'connected' ? '#00e676' : status === 'error' ? '#ff3366' : '#8888aa' }}>
+      <span
+        className="text-xs font-medium"
+        style={{ color: status === 'connected' ? '#00e676' : status === 'error' ? '#ff3366' : '#8888aa' }}
+      >
         {labelForRuntimeStatus(status)}
       </span>
     </div>

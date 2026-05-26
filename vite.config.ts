@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { getRuntimeSourceSignature } from './scripts/local-runtime/runtimeIdentity.mjs';
 
 export default defineConfig({
   plugins: [react()],
@@ -8,6 +9,9 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  define: {
+    __EXPECTED_RUNTIME_SOURCE_SIGNATURE__: JSON.stringify(getRuntimeSourceSignature(__dirname)),
   },
   build: {
     chunkSizeWarningLimit: 700,
@@ -22,5 +26,9 @@ export default defineConfig({
         },
       },
     },
+  },
+  test: {
+    include: ['src/**/*.test.{ts,tsx,js,jsx}'],
+    exclude: ['node_modules/**', 'dist/**', 'scripts/**'],
   },
 });

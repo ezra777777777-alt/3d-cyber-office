@@ -1,13 +1,25 @@
 # 3D 赛博办公室迁移指南
 
-如果你要把项目迁移到另一台电脑，请先看：
+如果你要把项目迁移到另一台电脑，按目标系统阅读：
 
-1. `windows-to-windows.md`：Windows 到 Windows 迁移。
-2. `windows-to-mac.md`：Windows 到 macOS 迁移。
-3. `3d-cyber-office-data-migration.md`：完整迁移教程。
-4. `migration-checklist.md`：快速检查清单。
-5. `restore-drill-report.md`：恢复演练报告模板。
-6. `troubleshooting.md`：常见问题排查。
+1. `windows-to-windows.md`：Windows 到 Windows。
+2. `windows-to-mac.md`：Windows 到 macOS。
+3. `3d-cyber-office-data-migration.md`：浏览器本地数据导出/导入。
+4. `migration-checklist.md`：迁移检查清单。
+5. `troubleshooting.md`：常见问题排查。
+6. `../setup/local-startup-guide.md`：本地启动指南。
 7. `../qa/final-acceptance-checklist.md`：迁移后验收。
 
-重要提醒：真实 Runtime、AI provider token、API key、password 不会进入迁移包。换电脑后需要在外部安全 Runtime 中重新配置。
+## 重要提醒
+
+迁移包不会包含：
+
+- Runtime/API key
+- token
+- password
+- `.env`
+- `.env.*`
+- `node_modules/`
+- `dist/`
+
+换电脑后，请在新的安全 Runtime 环境里重新配置模型供应商凭据。

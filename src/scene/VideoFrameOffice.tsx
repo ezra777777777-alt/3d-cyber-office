@@ -1,7 +1,7 @@
 import { VideoFrameOfficeEnvironment } from './VideoFrameOfficeEnvironment';
 import { VideoFrameFurnitureLayer } from './VideoFrameFurnitureLayer';
 import { VideoFrameAgentLayer } from './VideoFrameAgentLayer';
-import { VIDEO_FRAME_PALETTE } from './videoFrameReplicaSpec';
+import { VIDEO_FRAME_LANDMARKS, VIDEO_FRAME_PALETTE } from './videoFrameReplicaSpec';
 
 function LobsterIdentityBoard() {
   return (
@@ -39,6 +39,53 @@ function BottomAgentDockHint() {
   );
 }
 
+function SceneLandmarks() {
+  const board = VIDEO_FRAME_LANDMARKS.blueInfoBoard;
+  const arch = VIDEO_FRAME_LANDMARKS.rearArch;
+  return (
+    <group>
+      <group position={board.position}>
+        <mesh>
+          <boxGeometry args={board.size} />
+          <meshStandardMaterial
+            color="#1f5f86"
+            emissive="#0d3149"
+            emissiveIntensity={0.28}
+            roughness={0.48}
+            metalness={0.08}
+          />
+        </mesh>
+        <mesh position={[0, 0.25, 0.052]}>
+          <boxGeometry args={[1.1, 0.055, 0.012]} />
+          <meshBasicMaterial color={VIDEO_FRAME_PALETTE.statusCyan} transparent opacity={0.75} />
+        </mesh>
+        <mesh position={[-0.22, -0.04, 0.052]}>
+          <boxGeometry args={[0.62, 0.045, 0.012]} />
+          <meshBasicMaterial color="#b9eaff" transparent opacity={0.56} />
+        </mesh>
+        <mesh position={[0.2, -0.22, 0.052]}>
+          <boxGeometry args={[0.76, 0.045, 0.012]} />
+          <meshBasicMaterial color="#b9eaff" transparent opacity={0.42} />
+        </mesh>
+      </group>
+      <group position={arch.position}>
+        <mesh position={[-arch.width / 2, arch.height / 2, 0]}>
+          <cylinderGeometry args={[0.045, 0.045, arch.height, 8]} />
+          <meshStandardMaterial color="#2b7152" roughness={0.58} />
+        </mesh>
+        <mesh position={[arch.width / 2, arch.height / 2, 0]}>
+          <cylinderGeometry args={[0.045, 0.045, arch.height, 8]} />
+          <meshStandardMaterial color="#2b7152" roughness={0.58} />
+        </mesh>
+        <mesh position={[0, arch.height, 0]}>
+          <boxGeometry args={[arch.width + 0.2, 0.08, 0.08]} />
+          <meshStandardMaterial color="#2b7152" roughness={0.58} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
 export function VideoFrameOffice() {
   return (
     <>
@@ -47,6 +94,7 @@ export function VideoFrameOffice() {
       <VideoFrameOfficeEnvironment />
       <VideoFrameFurnitureLayer />
       <VideoFrameAgentLayer />
+      <SceneLandmarks />
       <LobsterIdentityBoard />
       <BottomAgentDockHint />
     </>

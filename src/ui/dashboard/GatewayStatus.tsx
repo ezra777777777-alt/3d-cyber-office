@@ -1,5 +1,6 @@
 import { demoGateways } from '@/data/demoSchedules';
 import { useRuntimeStore } from '@/store/runtimeStore';
+import { buildRuntimeHealthView } from '@/runtime/runtimeHealth';
 import { WorkbenchHeader, SourceBadge } from './WorkbenchHeader';
 import { GatewayDiagnosticsView } from './GatewayDiagnostics';
 import { RuntimeEventInspector } from '../runtime/RuntimeEventInspector';
@@ -25,12 +26,12 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 function gatewayAdvice(status: string, mode: string): string {
-  if (status === 'protocol_mismatch') return '这是受保护的占位连接。接入真实 OpenClaw 服务前不会要求输入 token。';
-  if (status === 'connected') return 'Runtime 正在通过事件边界同步到办公室。';
-  if (status === 'connecting') return '正在建立连接，请观察心跳和诊断。';
-  if (mode === 'mock') return 'Mock Runtime 用于验证事件边界与 UI 响应。';
-  if (status === 'error' || status === 'disconnected') return '连接已中断。可切换到 Mock 模式验证事件流。';
-  return '可切换到 Mock 模式验证事件流。';
+  if (status === 'connected') return '本地 Runtime 正在通过事件流同步到办公室。';
+  if (status === 'connecting') return '正在建立连接，请确认 npm run runtime 已启动。';
+  if (mode === 'mock') return 'Mock Runtime 用于验证事件边界和 UI 响应。';
+  if (status === 'error' || status === 'disconnected') return '连接已中断。请启动 npm run runtime，或切换到 Mock 模式验证事件流。';
+  if (status === 'protocol_mismatch') return '协议版本不匹配。请检查本地 Runtime 的 protocol/version。';
+  return '可切换到 Mock 或本地 Runtime 模式验证事件流。';
 }
 
 export function GatewayStatus() {
@@ -40,6 +41,10 @@ export function GatewayStatus() {
   const lastHeartbeatAt = useRuntimeStore((s) => s.lastHeartbeatAt);
   const rawEventCount = useRuntimeStore((s) => s.rawEvents.length);
   const runtimeEndpoint = useRuntimeStore((s) => s.endpoint);
+  const setRuntimeEndpoint = useRuntimeStore((s) => s.setEndpoint);
+  const refreshHealth = useRuntimeStore((s) => s.refreshHealth);
+  const runtimeHealth = useRuntimeStore((s) => s.health);
+  const healthView = buildRuntimeHealthView(runtimeEndpoint, runtimeHealth);
 
   const advice = gatewayAdvice(runtimeStatus, runtimeMode);
 
@@ -87,13 +92,52 @@ export function GatewayStatus() {
             {advice}
           </div>
 
-          {runtimeMode === 'connected' && (
-            <div className="mt-2 text-xs text-[#f0a500] border border-[#f0a500]/30 rounded p-2 bg-[#f0a500]/5">
-              占位连接，不会请求凭据。当前真实适配器尚未接入 OpenClaw 服务。
+          {runtimeMode === 'connected' && runtimeStatus !== 'connected' && (
+            <div className="mt-2 text-xs text-amber-300 border border-amber-300/30 rounded p-2 bg-amber-300/5">
+              请先在项目根目录运行：<code className="font-mono">npm run runtime</code>
             </div>
           )}
 
           {runtimeDiagnostics.length > 0 && <GatewayDiagnosticsView diagnostics={runtimeDiagnostics} />}
+        </div>
+
+        {/* Runtime endpoint and health panel */}
+        <div className="cyber-panel p-3">
+          <div className="text-xs text-gray-400 mb-2">本地 Runtime 端点</div>
+          <div className="flex gap-2 max-sm:flex-col">
+            <input
+              className="cyber-input flex-1"
+              value={runtimeEndpoint}
+              onChange={(event) => setRuntimeEndpoint(event.target.value)}
+              aria-label="Runtime endpoint"
+            />
+            <button className="cyber-btn" type="button" onClick={refreshHealth}>
+              检查连接
+            </button>
+          </div>
+          {healthView.staleWarning && (
+            <div className="mt-2 text-xs text-amber-300 border border-amber-400/30 rounded p-2">
+              {healthView.staleWarning}
+            </div>
+          )}
+          <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-2 mt-3 text-xs">
+            {healthView.detailRows.map((row) => (
+              <div
+                key={row.label}
+                className="flex justify-between gap-3 border border-white/10 rounded px-2 py-1"
+              >
+                <span className="text-gray-500">{row.label}</span>
+                <span className="text-gray-200 font-mono text-right break-all">{row.value}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-2 text-xs text-gray-400 leading-relaxed">
+            如果端口被旧进程占用，请先结束旧的 node 进程，或设置环境变量换端口：
+            <code className="font-mono">
+              {' '}
+              $env:LOCAL_RUNTIME_PORT=&quot;19765&quot;; npm.cmd run runtime
+            </code>
+          </div>
         </div>
 
         {/* Demo gateway reference cards */}

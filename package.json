@@ -5,9 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:all": "node scripts/dev/start-all.mjs",
+    "doctor": "node scripts/dev/doctor.mjs",
+    "check:ports": "node scripts/dev/check-ports.mjs",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "runtime": "node scripts/local-runtime/server.mjs",
+    "runtime:test": "node --test scripts/local-runtime/*.test.mjs",
+    "runtime:e2e": "node scripts/local-runtime/e2e-user-flow.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.3",

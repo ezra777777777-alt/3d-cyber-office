@@ -14,5 +14,9 @@
 - [ ] Demo still runs.
 - [ ] Runtime credentials recreated manually if needed.
 - [ ] Restore drill report completed.
-- [ ] Target machine ran `npm install` locally.
-- [ ] `node_modules/` was not copied between machines.
+- [ ] `npm.cmd run doctor` or `npm run doctor` completed on target.
+- [ ] `node_modules/` was installed on target, not copied.
+- [ ] `.env` and `.env.*` were not copied unless intentionally recreated.
+- [ ] `.local-runtime/` was not copied unless historical runtime artifacts are intentionally preserved.
+- [ ] Gateway endpoint points to the target machine runtime.
+- [ ] Runtime credentials were recreated manually if needed.

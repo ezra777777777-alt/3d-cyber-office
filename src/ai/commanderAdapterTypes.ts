@@ -1,6 +1,6 @@
 import type { OfficeEvent } from '@/core/types';
 
-export type CommanderAdapterMode = 'demo' | 'mock_ai' | 'guarded_real';
+export type CommanderAdapterMode = 'demo' | 'mock_ai' | 'guarded_real' | 'local_runtime';
 export type CommanderAdapterStatus =
   | 'idle'
   | 'planning'
@@ -40,6 +40,7 @@ export interface PlannedMissionTask {
 }
 
 export interface CommanderPlannerResult {
+  missionId?: string;
   missionTitle: string;
   missionSummary?: string;
   tasks: PlannedMissionTask[];

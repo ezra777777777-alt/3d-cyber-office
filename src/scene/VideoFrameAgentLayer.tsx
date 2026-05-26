@@ -1,7 +1,7 @@
 import { useOfficeStore } from '@/store/officeStore';
 import type { AgentStatus } from '@/core/types';
 import { VideoFrameAvatar } from './VideoFrameAvatar';
-import { VIDEO_FRAME_PALETTE, VIDEO_FRAME_SLOTS } from './videoFrameReplicaSpec';
+import { getVideoFrameAmbientAvatarSlots, VIDEO_FRAME_PALETTE, VIDEO_FRAME_SLOTS } from './videoFrameReplicaSpec';
 
 const STATUS_COLOR: Record<AgentStatus, string> = {
   idle: '#7f8b98',
@@ -48,6 +48,17 @@ export function VideoFrameAgentLayer() {
           />
         );
       })}
+      {getVideoFrameAmbientAvatarSlots().map((slot, index) => (
+        <VideoFrameAvatar
+          key={slot.id}
+          position={slot.position}
+          rotationY={slot.rotationY}
+          variant="worker"
+          statusColor={index % 2 === 0 ? VIDEO_FRAME_PALETTE.statusCyan : VIDEO_FRAME_PALETTE.statusGreen}
+          active={false}
+          scale={slot.scale}
+        />
+      ))}
     </group>
   );
 }

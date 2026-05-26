@@ -9,6 +9,7 @@ export interface VideoFrameAvatarProps {
   variant: 'commander' | 'worker';
   statusColor: string;
   active: boolean;
+  scale?: number;
 }
 
 function Chair() {
@@ -34,50 +35,62 @@ function Chair() {
   );
 }
 
-function StatusDiamond({ color, active }: { color: string; active: boolean }) {
+function StatusMarker({ color, active }: { color: string; active: boolean }) {
   return (
-    <mesh position={[0, 0.04, 0.08]} rotation={[-Math.PI / 2, 0, Math.PI / 4]}>
-      <ringGeometry args={[0.22, 0.3, 4]} />
-      <meshBasicMaterial color={color} transparent opacity={active ? 0.68 : 0.32} />
+    <mesh position={[0, 0.36, 0.18]}>
+      <boxGeometry args={[0.12, 0.035, 0.025]} />
+      <meshBasicMaterial color={color} transparent opacity={active ? 0.78 : 0.38} />
     </mesh>
   );
 }
 
-export function VideoFrameAvatar({ position, rotationY, variant, statusColor, active }: VideoFrameAvatarProps) {
+export function VideoFrameAvatar({ position, rotationY, variant, statusColor, active, scale = 1 }: VideoFrameAvatarProps) {
   const root = useRef<THREE.Group>(null);
   const head = useRef<THREE.Mesh>(null);
   const isCommander = variant === 'commander';
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime;
-    if (root.current) root.current.position.y = position[1] + Math.sin(t * (active ? 2.2 : 1.1)) * 0.014;
-    if (head.current) head.current.rotation.y = Math.sin(t * 1.25) * (active ? 0.06 : 0.025);
+    if (root.current) root.current.position.y = position[1] + Math.sin(t * (active ? 1.8 : 1.1)) * 0.004;
+    if (head.current) head.current.rotation.y = Math.sin(t * 1.15) * (active ? 0.035 : 0.015);
   });
 
   return (
-    <group ref={root} position={position} rotation={[0, rotationY, 0]} scale={isCommander ? 1.0 : 0.82}>
+    <group ref={root} position={position} rotation={[0, rotationY, 0]} scale={(isCommander ? 0.9 : 0.7) * scale}>
       <Chair />
-      <mesh position={[-0.07, 0.15, 0]}>
-        <boxGeometry args={[0.065, 0.3, 0.075]} />
+      <mesh position={[-0.07, 0.16, 0.02]}>
+        <boxGeometry args={[0.07, 0.18, 0.08]} />
         <meshStandardMaterial color="#101319" roughness={0.72} />
       </mesh>
-      <mesh position={[0.07, 0.15, 0]}>
-        <boxGeometry args={[0.065, 0.3, 0.075]} />
+      <mesh position={[0.07, 0.16, 0.02]}>
+        <boxGeometry args={[0.07, 0.18, 0.08]} />
         <meshStandardMaterial color="#101319" roughness={0.72} />
       </mesh>
-      <mesh position={[0, 0.46, 0.04]}>
-        <boxGeometry args={[isCommander ? 0.38 : 0.34, isCommander ? 0.4 : 0.36, 0.24]} />
+      <mesh position={[0, 0.43, 0.035]}>
+        <boxGeometry args={[isCommander ? 0.38 : 0.32, isCommander ? 0.34 : 0.3, 0.24]} />
         <meshStandardMaterial color={isCommander ? VIDEO_FRAME_PALETTE.commanderBody : VIDEO_FRAME_PALETTE.workerBody} roughness={0.64} />
       </mesh>
-      <mesh ref={head} position={[0, 0.8, 0.04]}>
-        <boxGeometry args={[isCommander ? 0.4 : 0.34, isCommander ? 0.4 : 0.34, isCommander ? 0.4 : 0.34]} />
-        <meshStandardMaterial color={isCommander ? '#d96b45' : VIDEO_FRAME_PALETTE.workerHead} roughness={0.54} />
+      <mesh position={[-0.2, 0.43, 0.06]} rotation={[0, 0, 0.04]}>
+        <boxGeometry args={[0.045, 0.2, 0.06]} />
+        <meshStandardMaterial color={isCommander ? '#a44a32' : '#1a2028'} roughness={0.7} />
       </mesh>
-      <mesh position={[0, 0.82, isCommander ? 0.25 : 0.22]}>
-        <boxGeometry args={[isCommander ? 0.28 : 0.23, 0.035, 0.022]} />
+      <mesh position={[0.2, 0.43, 0.06]} rotation={[0, 0, -0.04]}>
+        <boxGeometry args={[0.045, 0.2, 0.06]} />
+        <meshStandardMaterial color={isCommander ? '#a44a32' : '#1a2028'} roughness={0.7} />
+      </mesh>
+      <mesh ref={head} position={[0, 0.68, 0.04]}>
+        <boxGeometry args={[isCommander ? 0.36 : 0.3, isCommander ? 0.34 : 0.28, isCommander ? 0.34 : 0.3]} />
+        <meshStandardMaterial color={isCommander ? '#b75638' : VIDEO_FRAME_PALETTE.workerHead} roughness={0.62} />
+      </mesh>
+      <mesh position={[0, 0.84, 0.015]}>
+        <boxGeometry args={[isCommander ? 0.38 : 0.32, 0.045, isCommander ? 0.36 : 0.32]} />
+        <meshStandardMaterial color={isCommander ? '#8f2f26' : '#202630'} roughness={0.68} />
+      </mesh>
+      <mesh position={[0, 0.69, isCommander ? 0.23 : 0.2]}>
+        <boxGeometry args={[isCommander ? 0.24 : 0.2, 0.028, 0.02]} />
         <meshBasicMaterial color={statusColor} transparent opacity={0.76} />
       </mesh>
-      <StatusDiamond color={statusColor} active={active || isCommander} />
+      <StatusMarker color={statusColor} active={active || isCommander} />
     </group>
   );
 }

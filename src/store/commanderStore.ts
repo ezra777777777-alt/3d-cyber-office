@@ -235,7 +235,8 @@ export const useCommanderStore = create<CommanderState>()(
         if (!event.missionId) return;
 
         if (event.type === 'commander.summary_ready') {
-          get().setMissionSummary(event.missionId, String(event.payload.message ?? 'Mission update ready.'));
+          const summary = String(event.payload.summary ?? event.payload.message ?? '任务已完成。');
+          get().setMissionSummary(event.missionId, summary);
           if (event.payload.missionStatus === 'completed') {
             get().setMissionStatus(event.missionId, 'completed');
           }

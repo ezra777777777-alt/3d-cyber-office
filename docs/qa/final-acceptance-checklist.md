@@ -90,3 +90,9 @@
 - [x] No Drei Text / troika text rendering is used in scene components. (grep: no matches in src/)
 - [x] 132 tests pass across 26 test files.
 - [x] Build successful, no bundle regression.
+- [ ] Plan 24 Local Runtime MVP: `npm run runtime` starts, browser connects via SSE, Commander submits mission, tasks/approval/artifact events project into office UI.
+- [ ] Plan 25 Real Model Planner: mock provider works, missing-key provider fails closed, configured provider returns a validated plan, and no secret appears in UI or logs.
+- [ ] Plan 26 Safe Tool Execution: low-risk tools work, high-risk tools request approval, approved writes are scoped, non-allowlisted commands are rejected.
+- [ ] Plan 27 Multi-Agent Closed Loop: mission engine runs tasks in dependency order, workers produce artifacts, approval pauses high-risk actions, completed missions emit summary.
+- [ ] Plan 28 Runtime Usability and Closed-Loop Hardening: /health includes identity fields, stale runtime detection works in Gateway, default approval gate fires for builder+high-risk, mission_completed event maps correctly, ApprovalInbox shows loading/error states, dead code removed, .local-runtime/ gitignored, `npm run runtime:e2e` passes.
+- [ ] Plan 29 Startup and Migration Experience: `doctor` diagnoses project root/deps/ports/runtime, `check:ports` reports port status, `dev:all` starts both services, migration docs are clean Chinese with correct commands.

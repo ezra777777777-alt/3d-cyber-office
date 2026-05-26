@@ -5,6 +5,7 @@ import type { NormalizedRuntimeEvent, RuntimeMessageType, RuntimeRawMessage } fr
 
 const MESSAGE_TO_EVENT: Partial<Record<RuntimeMessageType, EventType>> = {
   'runtime.heartbeat': 'runtime.heartbeat',
+  'runtime.worker_status': 'agent.status_changed',
   'runtime.task_created': 'task.created',
   'runtime.task_planned': 'task.planned',
   'runtime.task_assigned': 'task.assigned',
@@ -18,6 +19,7 @@ const MESSAGE_TO_EVENT: Partial<Record<RuntimeMessageType, EventType>> = {
   'runtime.task_completed': 'task.completed',
   'runtime.task_failed': 'task.failed',
   'runtime.adapter_error': 'runtime.adapter_error',
+  'runtime.mission_completed': 'commander.summary_ready',
 };
 
 export function normalizeRuntimeEvent(raw: RuntimeRawMessage): NormalizedRuntimeEvent {

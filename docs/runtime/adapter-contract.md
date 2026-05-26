@@ -255,3 +255,20 @@ Full tool execution and file writes come later.
 - Connected mode requires installing/running the local runtime on the new device.
 - Secrets are re-created on the target machine, not exported.
 - Browser localStorage export is not enough to migrate a real runtime.
+
+## Local Runtime MVP
+
+Connected mode now targets the local runtime process at `http://127.0.0.1:8765`.
+
+The browser connects with:
+
+- `GET /events` for Server-Sent Events.
+- `POST /missions` for Commander planning.
+- `POST /approvals/:approvalId/resolve` for approval decisions.
+
+This runtime is still deterministic and safe:
+
+- It does not store API keys.
+- It does not write files.
+- It does not run shell commands.
+- It only emits event metadata into the office.

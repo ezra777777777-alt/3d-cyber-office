@@ -69,7 +69,7 @@ export const agentStatusLabels: Record<AgentStatus, string> = {
 export const runtimeModeLabels: Record<RuntimeMode, string> = {
   demo: '演示',
   mock: '模拟',
-  connected: '真实连接',
+  connected: '本地 Runtime',
   offline: '离线',
   error: '错误',
 };
@@ -78,7 +78,7 @@ export const runtimeStatusLabels: Record<RuntimeConnectionStatus, string> = {
   idle: '待机',
   connecting: '连接中',
   connected: '已连接',
-  degraded: '性能降级',
+  degraded: '降级',
   protocol_mismatch: '协议不匹配',
   disconnected: '已断开',
   error: '错误',

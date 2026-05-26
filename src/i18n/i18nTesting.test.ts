@@ -45,7 +45,7 @@ describe('Chinese UI labels', () => {
   });
 
   it('covers runtime labels without changing runtime IDs', () => {
-    expect(runtimeModeLabels.connected).toBe('真实连接');
+    expect(runtimeModeLabels.connected).toBe('本地 Runtime');
     expect(runtimeStatusLabels.protocol_mismatch).toBe('协议不匹配');
   });
 
