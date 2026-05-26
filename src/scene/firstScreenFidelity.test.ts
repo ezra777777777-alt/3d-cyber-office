@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CLAW_FIRST_SCREEN_CAMERA,
   FIRST_SCREEN_CAMERA,
   FIRST_SCREEN_SAFE_ZONES,
   FIRST_SCREEN_VISUAL_THRESHOLDS,
   isCameraPresetValid,
   isSafeZoneReasonable,
 } from './firstScreenFidelity';
+import { VIDEO_GRADE_CAMERA } from './videoGradeVisualSpec';
 
 describe('first-screen fidelity config', () => {
   it('uses a valid camera that can see commander and worker areas', () => {
@@ -19,6 +21,12 @@ describe('first-screen fidelity config', () => {
     expect(FIRST_SCREEN_CAMERA.target).toEqual([0, 0.85, -2.4]);
     expect(FIRST_SCREEN_CAMERA.position[1]).toBeLessThan(8);
     expect(FIRST_SCREEN_CAMERA.position[2]).toBeGreaterThan(7);
+  });
+
+  it('uses the Plan 32 video-grade camera for the claw office path', () => {
+    expect(CLAW_FIRST_SCREEN_CAMERA).toEqual(VIDEO_GRADE_CAMERA);
+    expect(CLAW_FIRST_SCREEN_CAMERA.position[1]).toBeGreaterThanOrEqual(6.8);
+    expect(CLAW_FIRST_SCREEN_CAMERA.target[2]).toBeLessThan(-2.6);
   });
 
   it('keeps office overlays from claiming the whole viewport', () => {

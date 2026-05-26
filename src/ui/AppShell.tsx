@@ -268,7 +268,7 @@ export function AppShell() {
         <div className="absolute left-2 top-20 z-20 pointer-events-none max-w-[22rem]">
           <GuidedDemoHud />
         </div>
-        <div className="absolute bottom-2 right-2 z-30 pointer-events-auto">
+        <div className={`absolute bottom-2 right-2 z-30 pointer-events-auto ${officeVisualStyle === 'claw3d' ? 'video-demo-controls-slot' : ''}`}>
           <DemoControls />
         </div>
       </div>

@@ -71,3 +71,17 @@ Acceptance is based on manual side-by-side visual review:
 - Composition: office center remains visible.
 
 Automated checks cover visual constraints and build safety. Final likeness requires browser visual review.
+
+## Plan 32 Video-Grade Visual V2
+
+Plan 32 replaces the Plan 21 video-frame approximation with a stricter visual system:
+
+- Larger open office island.
+- Stronger dark shell and warm floor contrast.
+- Cleaner Commander station and lobster identity mark.
+- Smaller seated block workers.
+- Controlled density budgets for Low/Normal/Showcase.
+- Runtime state cues tied to real office status.
+- Mobile safe-zone rules for the center office.
+
+Final acceptance requires side-by-side browser review against the reference frames listed in `docs/qa/video-grade-visual-v2-checklist.md`.

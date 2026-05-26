@@ -289,6 +289,8 @@ If agents start doing real work, logs alone are not enough. Users need a durable
 
 ## 10. Plan 32 Outline: Video-Grade Visual Rebuild V2
 
+**Detailed plan:** `docs/superpowers/plans/32-video-grade-visual-rebuild-v2.md`
+
 **Primary goal:** Rebuild the office, lobster, and workers around the stable mission workflow so the first impression feels closer to the reference video.
 
 **Problem to solve:**
@@ -328,6 +330,8 @@ Previous visual attempts improved structure, but user feedback remains clear: th
 ---
 
 ## 11. Plan 33 Outline: Performance and Release Packaging
+
+**Detailed plan:** `docs/superpowers/plans/33-performance-and-release-packaging.md`
 
 **Primary goal:** Prepare the project for repeatable local release and stable performance.
 
@@ -414,4 +418,4 @@ Execute in strict order:
 5. Write and execute detailed Plan 32.
 6. Write and execute detailed Plan 33.
 
-Plans 29-31 now have detailed implementation documents. Keep writing Plans 32-33 only after the previous plan lands and is verified, because file paths, UI shape, runtime contracts, and visual priorities are still changing.
+Plans 29-33 now have detailed implementation documents. Treat this roadmap as the execution record for the local MVP hardening phase; later Plans 34+ should start from the final Plan 33 verification report.
