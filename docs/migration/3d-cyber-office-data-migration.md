@@ -22,6 +22,8 @@ Not migrated:
 - `dist/`.
 - Browser cache.
 - Live runtime process state.
+- Runtime mission history under `.local-runtime/missions`.
+- Runtime artifact files under `.local-runtime/artifacts`.
 
 ## Source Computer Steps
 
@@ -102,6 +104,19 @@ Runtime credentials are never exported. On the target computer:
 2. Recreate tokens or API keys through that runtime's own secure setup.
 3. Open Gateway or Runtime mode.
 4. Confirm heartbeat and protocol diagnostics.
+
+## Runtime Mission History
+
+Mission history is file-system state, not browser state. To move it:
+
+1. Stop runtime.
+2. Copy `.local-runtime/missions`.
+3. Copy `.local-runtime/artifacts`.
+4. Do not copy `.env`.
+5. Start runtime on the target computer.
+6. Open History and refresh.
+
+API keys and `.env` files are not migrated.
 
 ## Rollback
 

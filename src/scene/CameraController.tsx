@@ -58,6 +58,10 @@ export function CameraController() {
   useEffect(() => {
     _camera = camera;
     camera.position.copy(defaultPos);
+    if (camera instanceof THREE.PerspectiveCamera && defaultCamera.fov) {
+      camera.fov = defaultCamera.fov;
+      camera.updateProjectionMatrix();
+    }
     camera.lookAt(defaultTarget);
     return () => { _camera = null; };
   }, [camera, defaultPos, defaultTarget]);

@@ -7,6 +7,7 @@ const MODULES: { id: ModuleId }[] = [
   { id: 'tasks' },
   { id: 'logs' },
   { id: 'files' },
+  { id: 'history' },
   { id: 'cronjobs' },
   { id: 'gateway' },
   { id: 'review' },

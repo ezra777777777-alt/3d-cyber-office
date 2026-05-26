@@ -13,7 +13,11 @@
     "test": "vitest run",
     "runtime": "node scripts/local-runtime/server.mjs",
     "runtime:test": "node --test scripts/local-runtime/*.test.mjs",
-    "runtime:e2e": "node scripts/local-runtime/e2e-user-flow.mjs"
+    "runtime:e2e": "node scripts/local-runtime/e2e-user-flow.mjs",
+    "release:test": "node --test scripts/release/*.test.mjs",
+    "build:metrics": "node scripts/release/build-metrics.mjs",
+    "release:smoke": "node scripts/release/smoke.mjs",
+    "release:package": "node scripts/release/package-local.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.3",

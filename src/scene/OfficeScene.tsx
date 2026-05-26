@@ -18,10 +18,10 @@ import { CommanderStation } from './CommanderStation';
 import { CommanderVisualLayer } from './CommanderVisualLayer';
 import { brightOfficeTheme } from './sceneVisualTheme';
 import { VideoFrameOffice } from './VideoFrameOffice';
-import { VIDEO_FRAME_PALETTE } from './videoFrameReplicaSpec';
+import { VIDEO_GRADE_PALETTE } from './videoGradeVisualSpec';
 
 const BG = brightOfficeTheme.firstScreenBackground;
-const CLAW_BG = VIDEO_FRAME_PALETTE.background;
+const CLAW_BG = VIDEO_GRADE_PALETTE.background;
 
 function ForceInitialRender() {
   const { gl, scene, camera } = useThree();

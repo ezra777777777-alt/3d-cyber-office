@@ -28,6 +28,7 @@ describe('Chinese UI labels', () => {
       'review',
       'rest',
       'migration',
+      'history',
     ]);
     expect(findMissingLabels(moduleLabels, getKnownModuleIds())).toEqual([]);
     expect(Object.values(moduleLabels).every(hasChineseText)).toBe(true);

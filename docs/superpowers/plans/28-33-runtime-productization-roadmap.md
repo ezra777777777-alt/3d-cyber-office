@@ -107,6 +107,7 @@ flowchart LR
   P30 --> P31["Plan 31<br/>Artifact center and replay"]
   P31 --> P32["Plan 32<br/>Video-grade visual rebuild V2"]
   P32 --> P33["Plan 33<br/>Performance and release packaging"]
+  P33 --> P331["Plan 33.1<br/>Release closure hotfix"]
   P29 --> P33
 ```
 
@@ -241,6 +242,8 @@ The current local runtime has the right shape, but much of the worker output is 
 
 ## 9. Plan 31 Outline: Artifact Center and Mission Replay
 
+**Detailed plan:** `docs/superpowers/plans/31-artifact-center-and-mission-replay.md`
+
 **Primary goal:** Make completed work inspectable after the moment has passed.
 
 **Problem to solve:**
@@ -287,6 +290,8 @@ If agents start doing real work, logs alone are not enough. Users need a durable
 
 ## 10. Plan 32 Outline: Video-Grade Visual Rebuild V2
 
+**Detailed plan:** `docs/superpowers/plans/32-video-grade-visual-rebuild-v2.md`
+
 **Primary goal:** Rebuild the office, lobster, and workers around the stable mission workflow so the first impression feels closer to the reference video.
 
 **Problem to solve:**
@@ -327,6 +332,8 @@ Previous visual attempts improved structure, but user feedback remains clear: th
 
 ## 11. Plan 33 Outline: Performance and Release Packaging
 
+**Detailed plan:** `docs/superpowers/plans/33-performance-and-release-packaging.md`
+
 **Primary goal:** Prepare the project for repeatable local release and stable performance.
 
 **Problem to solve:**
@@ -360,6 +367,34 @@ The build succeeds, but `vendor-3d` is large and chunk warnings remain. Startup 
 - Runtime E2E still passes.
 - Bundle warnings are either fixed or documented with accepted budget.
 - Release checklist gives exact Windows/mac commands.
+
+---
+
+## 11.1 Plan 33.1 Outline: Release Closure Hotfix
+
+**Detailed plan:** `docs/superpowers/plans/33.1-release-closure-hotfix.md`
+
+**Primary goal:** Close the remaining Plan 33 release blockers before calling the local MVP release complete.
+
+**Problem to solve:**
+
+Plan 33 passed local build, package, smoke, runtime, and browser checks, but release closure is not complete because GitHub push failed and repeated `build:metrics` in a temporary clone can dirty `docs/qa/build-metrics.json`.
+
+**Feature requirements:**
+
+- Make `build-metrics.json` deterministic by removing wall-clock timestamps and normalizing Vite hash filenames.
+- Add release metrics tests for hash stability.
+- Update clean-clone instructions to install dependencies before tests.
+- Complete GitHub push or report exact branch/commit/auth blocker.
+- Re-run release gate after the hotfix.
+
+**Acceptance gate:**
+
+- `npm.cmd run release:test` passes.
+- `npm.cmd run build:metrics` can run twice without dirtying `docs/qa/build-metrics.json`.
+- `npm.cmd run runtime:e2e` passes.
+- `npm.cmd run release:smoke` passes.
+- GitHub push succeeds, or the only remaining blocker is reported with branch and commit SHA.
 
 ---
 
@@ -412,4 +447,4 @@ Execute in strict order:
 5. Write and execute detailed Plan 32.
 6. Write and execute detailed Plan 33.
 
-Do not write all implementation-level details for Plans 29-33 at once. The right level now is this roadmap. Each later plan should be written after the previous plan lands, because the file paths, UI shape, and runtime contracts will change.
+Plans 29-33.1 now have detailed implementation documents. Treat this roadmap as the execution record for the local MVP hardening phase; later Plans 34+ should start from the final Plan 33.1 verification report.

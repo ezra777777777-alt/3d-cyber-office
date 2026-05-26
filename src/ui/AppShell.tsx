@@ -19,6 +19,7 @@ const CalendarView = lazy(() => import('./dashboard/CalendarView').then((m) => (
 const TasksView = lazy(() => import('./dashboard/TasksView').then((m) => ({ default: m.TasksView })));
 const LogsView = lazy(() => import('./dashboard/LogsView').then((m) => ({ default: m.LogsView })));
 const FilesView = lazy(() => import('./dashboard/FilesView').then((m) => ({ default: m.FilesView })));
+const MissionHistoryView = lazy(() => import('./dashboard/MissionHistoryView').then((m) => ({ default: m.MissionHistoryView })));
 const CronJobsView = lazy(() => import('./dashboard/CronJobsView').then((m) => ({ default: m.CronJobsView })));
 const GatewayStatus = lazy(() => import('./dashboard/GatewayStatus').then((m) => ({ default: m.GatewayStatus })));
 const DailyReview = lazy(() => import('./dashboard/DailyReview').then((m) => ({ default: m.DailyReview })));
@@ -241,6 +242,8 @@ export function AppShell() {
                   <LogsView />
                 ) : activeModule === 'files' ? (
                   <FilesView />
+                ) : activeModule === 'history' ? (
+                  <MissionHistoryView />
                 ) : activeModule === 'cronjobs' ? (
                   <CronJobsView />
                 ) : activeModule === 'gateway' ? (
@@ -265,7 +268,7 @@ export function AppShell() {
         <div className="absolute left-2 top-20 z-20 pointer-events-none max-w-[22rem]">
           <GuidedDemoHud />
         </div>
-        <div className="absolute bottom-2 right-2 z-30 pointer-events-auto">
+        <div className={`absolute bottom-2 right-2 z-30 pointer-events-auto ${officeVisualStyle === 'claw3d' ? 'video-demo-controls-slot' : ''}`}>
           <DemoControls />
         </div>
       </div>

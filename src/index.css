@@ -516,9 +516,9 @@
     top: 12px;
     bottom: 16px;
     z-index: 26;
-    width: 42px;
-    border-radius: 12px;
-    background: rgba(5, 8, 14, 0.66);
+    width: 46px;
+    border-radius: 8px;
+    background: rgba(5, 8, 14, 0.72);
     border: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     flex-direction: column;
@@ -529,9 +529,9 @@
   }
 
   .video-rail-logo {
-    width: 24px;
-    height: 24px;
-    border-radius: 7px;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
     display: grid;
     place-items: center;
     background: #f05f4b;
@@ -541,8 +541,8 @@
   }
 
   .video-rail-agent {
-    width: 25px;
-    height: 25px;
+    width: 28px;
+    height: 28px;
     border-radius: 8px;
     display: grid;
     place-items: center;
@@ -566,9 +566,9 @@
     right: 14px;
     top: 68px;
     z-index: 26;
-    width: 240px;
-    border-radius: 14px;
-    background: rgba(5, 8, 14, 0.7);
+    width: 232px;
+    border-radius: 8px;
+    background: rgba(5, 8, 14, 0.78);
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: #e8edf3;
     padding: 13px;
@@ -584,7 +584,7 @@
   .video-lobster-icon {
     width: 34px;
     height: 34px;
-    border-radius: 10px;
+    border-radius: 8px;
     display: grid;
     place-items: center;
     background: #f05f4b;
@@ -612,11 +612,16 @@
     display: inline-flex;
     margin-top: 14px;
     padding: 5px 10px;
-    border-radius: 999px;
+    border-radius: 8px;
     background: rgba(65, 239, 154, 0.14);
     color: #65ef9a;
     font-size: 0.72rem;
     font-weight: 700;
+  }
+
+  .video-main-agent-status.is-approval {
+    background: rgba(255, 131, 209, 0.15);
+    color: #ff83d1;
   }
 
   .video-main-agent-grid {
@@ -638,7 +643,7 @@
     right: 14px;
     top: 72px;
     z-index: 26;
-    border-radius: 999px;
+    border-radius: 8px;
     padding: 8px 12px;
     background: rgba(5, 8, 14, 0.76);
     border: 1px solid rgba(240, 95, 75, 0.32);
@@ -663,23 +668,26 @@
     transform: translateX(-50%);
     z-index: 26;
     display: flex;
-    gap: 8px;
-    padding: 7px 11px;
-    border-radius: 14px;
-    background: rgba(5, 8, 14, 0.68);
+    width: min(380px, calc(100vw - 96px));
+    gap: 6px;
+    padding: 7px 9px;
+    border-radius: 8px;
+    background: rgba(5, 8, 14, 0.72);
     border: 1px solid rgba(255, 255, 255, 0.08);
     pointer-events: auto;
   }
 
   .video-bottom-agent-bar button {
-    min-width: 34px;
+    flex: 1 1 0;
+    min-width: 0;
     height: 31px;
-    border-radius: 10px;
+    border-radius: 8px;
     display: grid;
     place-items: center;
     background: rgba(255, 255, 255, 0.06);
     color: #dce6ef;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
+    white-space: nowrap;
   }
 
   .video-bottom-agent-bar button.active {
@@ -702,12 +710,43 @@
     .video-main-agent-chip {
       right: 8px;
       top: 64px;
+      max-width: 142px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .video-bottom-agent-bar {
-      bottom: 10px;
-      max-width: calc(100vw - 72px);
-      overflow: hidden;
+      bottom: 146px;
+      left: 46px;
+      right: 8px;
+      transform: none;
+      width: auto;
+      gap: 4px;
+      padding-inline: 6px;
+    }
+
+    .video-bottom-agent-bar button {
+      font-size: 0.68rem;
+    }
+
+    .video-demo-controls-slot {
+      bottom: 8px;
+      right: 8px;
+      left: 56px;
+    }
+
+    .video-demo-controls-slot > div {
+      width: 100%;
+      margin: 0;
+      padding: 6px;
+      gap: 6px;
+    }
+
+    .video-demo-controls-slot .cyber-btn {
+      min-width: 0;
+      padding-inline: 7px;
+      font-size: 0.64rem;
     }
   }
 

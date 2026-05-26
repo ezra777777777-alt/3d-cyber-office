@@ -1,3 +1,5 @@
+import { VIDEO_GRADE_CAMERA } from './videoGradeVisualSpec';
+
 export interface CameraPreset {
   id: string;
   position: [number, number, number];
@@ -18,15 +20,7 @@ export const FIRST_SCREEN_CAMERA: CameraPreset = {
   maxDistance: 18,
 };
 
-export const CLAW_FIRST_SCREEN_CAMERA: CameraPreset = {
-  id: 'video-main-frame-camera',
-  position: [8.6, 7.5, 10.8],
-  target: [0.1, 0.68, -2.7],
-  durationMs: 1100,
-  fov: 38,
-  minDistance: 5.2,
-  maxDistance: 18,
-};
+export const CLAW_FIRST_SCREEN_CAMERA: CameraPreset = VIDEO_GRADE_CAMERA;
 
 export const FIRST_SCREEN_SAFE_ZONES = {
   desktop: {

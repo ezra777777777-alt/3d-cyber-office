@@ -80,21 +80,28 @@ function statefulApprovalFromEvent(event: OfficeEvent): ApprovalRequest | null {
   };
 }
 
-function statefulArtifactFromEvent(event: OfficeEvent): Artifact | null {
+const ARTIFACT_KINDS = new Set(['notes', 'patch', 'review', 'report']);
+
+export function normalizedArtifactKind(value: unknown): Artifact['kind'] {
+  return ARTIFACT_KINDS.has(String(value)) ? (String(value) as Artifact['kind']) : 'notes';
+}
+
+export function statefulArtifactFromEvent(event: OfficeEvent): Artifact | null {
   if (!event.missionId || !event.artifactId || !event.taskId) return null;
+  const path = String(event.payload.path ?? '');
 
   return {
     id: event.artifactId,
     missionId: event.missionId,
-    title: String(event.payload.title ?? event.artifactId),
-    kind: 'notes',
-    path: String(event.payload.path ?? 'workspace/unknown.md'),
-    summary: 'Created by the Commander Demo scenario.',
-    createdByWorkerId: 'worker-research',
+    title: String(event.payload.title ?? event.payload.artifactTitle ?? 'Runtime artifact'),
+    kind: normalizedArtifactKind(event.payload.kind),
+    path,
+    summary: String(event.payload.summary ?? event.payload.outputSummary ?? ''),
+    createdByWorkerId: String(event.payload.createdByWorkerId ?? event.agentId ?? 'worker-runtime'),
     taskId: String(event.payload.missionTaskId),
     officeTaskId: event.taskId,
-    previewable: true,
-    workspaceBacked: false,
+    previewable: Boolean(event.payload.previewable ?? true),
+    workspaceBacked: Boolean(event.payload.workspaceBacked ?? path.startsWith('.local-runtime/')),
     createdAt: event.occurredAt,
   };
 }

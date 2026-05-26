@@ -95,6 +95,37 @@ test('worker prompt includes task and available tools', () => {
   assert.equal(prompt.includes('workspace.read_file'), true);
 });
 
+test('worker prompt includes context pack, prior artifacts, and output contract', () => {
+  const prompt = buildWorkerPrompt({
+    worker: getWorkerForRole('reviewer'),
+    mission: { id: 'mission-2', title: 'Runtime hardening' },
+    task: { id: 'review', title: 'Review runtime', summary: 'Check worker outputs.' },
+    artifacts: [{ title: 'Build report', summary: 'Builder used workerEngine.mjs.' }],
+    contextPack: {
+      files: [
+        {
+          path: 'scripts/local-runtime/workerEngine.mjs',
+          content: 'export function createWorkerEngine() {}',
+          truncated: false,
+        },
+      ],
+    },
+    tools: [
+      {
+        name: 'command.run',
+        risk: 'high',
+        description: 'Run an allowlisted project command.',
+      },
+    ],
+  });
+
+  assert.equal(prompt.includes('Return ONLY JSON'), true);
+  assert.equal(prompt.includes('scripts/local-runtime/workerEngine.mjs'), true);
+  assert.equal(prompt.includes('Builder used workerEngine.mjs.'), true);
+  assert.equal(prompt.includes('Run an allowlisted project command.'), true);
+  assert.equal(prompt.includes('requestedTool'), true);
+});
+
 // Task 3: Worker Engine
 
 test('worker engine writes a low-risk research artifact', async () => {
@@ -303,4 +334,240 @@ test('mission engine resumes dependent work after approval is resolved', async (
   } finally {
     await rm(root, { recursive: true, force: true });
   }
+});
+
+test('mission engine passes model env and fetcher into the default worker engine', async () => {
+  const events = [];
+  const root = await mkdtemp(path.join(os.tmpdir(), 'mission-engine-model-worker-'));
+  try {
+    const fetcher = async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        output_text: JSON.stringify({
+          summary: 'Model worker summary from mission engine.',
+          artifactTitle: 'Model worker artifact',
+          artifactKind: 'notes',
+          artifactContent: 'Model worker artifact content.',
+        }),
+      }),
+    });
+    const engine = createMissionEngine({
+      workspaceRoot: root,
+      emit: (type, partial) => events.push({ type, partial }),
+      env: {
+        provider: 'openai',
+        modelName: 'test-model',
+        apiKey: 'test-key',
+        maxOutputTokens: 1000,
+        temperature: 0.2,
+        configured: true,
+      },
+      fetcher,
+    });
+    const oneTaskPlan = {
+      missionId: 'mission-model-worker-default',
+      missionTitle: 'Model worker default',
+      missionSummary: 'Use configured worker model.',
+      tasks: [
+        {
+          id: 'research',
+          role: 'researcher',
+          title: 'Research',
+          summary: 'Research with model.',
+          risk: 'low',
+          dependencyIds: [],
+          expectedArtifactKinds: ['notes'],
+        },
+      ],
+    };
+
+    const snapshot = await engine.startMission(oneTaskPlan);
+    const artifactEvent = events.find((event) => event.type === 'runtime.artifact_created');
+
+    assert.equal(snapshot.mission.status, 'completed');
+    assert.equal(artifactEvent.partial.payload.title, 'Model worker artifact');
+    assert.equal(artifactEvent.partial.payload.summary, 'Model worker summary from mission engine.');
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('mission engine passes dependency artifacts to downstream workers', async () => {
+  const seenArtifacts = [];
+  const events = [];
+  const engine = createMissionEngine({
+    workspaceRoot: process.cwd(),
+    emit: (type, partial) => events.push({ type, partial }),
+    workerEngine: {
+      runTask: async ({ task, artifacts }) => {
+        seenArtifacts.push({
+          taskId: task.id,
+          artifacts: artifacts.map((artifact) => artifact.title),
+        });
+        return {
+          status: 'completed',
+          summary: `${task.id} done`,
+          artifact: {
+            artifactId: `artifact-${task.id}`,
+            title: `${task.id} artifact`,
+            path: `${task.id}.md`,
+            kind: 'notes',
+          },
+        };
+      },
+    },
+  });
+
+  await engine.startMission(plan);
+
+  assert.deepEqual(seenArtifacts.find((item) => item.taskId === 'research').artifacts, []);
+  assert.deepEqual(seenArtifacts.find((item) => item.taskId === 'build').artifacts, [
+    'research artifact',
+  ]);
+  assert.deepEqual(seenArtifacts.find((item) => item.taskId === 'review').artifacts, [
+    'build artifact',
+  ]);
+});
+
+test('reviewer can request an allowlisted command and complete after approval', async () => {
+  const events = [];
+  const executedCommands = [];
+  const engine = createMissionEngine({
+    workspaceRoot: process.cwd(),
+    emit: (type, partial) => events.push({ type, partial }),
+    tools: {
+      executeApproved: async (request) => {
+        executedCommands.push(request.input.command);
+        assert.equal(request.toolName, 'command.run');
+        assert.equal(request.input.command, 'npm.cmd run runtime:test');
+        return { code: 0, stdout: 'runtime tests passed', stderr: '' };
+      },
+    },
+    workerEngine: {
+      runTask: async ({ task }) => {
+        if (task.id === 'review') {
+          return {
+            status: 'approval_required',
+            summary: 'Need to run runtime tests.',
+            toolRequest: {
+              toolName: 'command.run',
+              input: { command: 'npm.cmd run runtime:test' },
+              reason: 'Reviewer needs runtime test results.',
+              impact: 'Runs an allowlisted runtime test command.',
+            },
+          };
+        }
+        return {
+          status: 'completed',
+          summary: `${task.id} done`,
+          artifact: {
+            artifactId: `artifact-${task.id}`,
+            title: `${task.id} artifact`,
+            path: `${task.id}.md`,
+            kind: 'notes',
+          },
+        };
+      },
+    },
+  });
+  const reviewPlan = {
+    missionId: 'mission-review-command',
+    missionTitle: 'Reviewer command approval',
+    missionSummary: 'Test reviewer command.run approval.',
+    tasks: [
+      {
+        id: 'research',
+        role: 'researcher',
+        title: 'Research',
+        summary: 'Research',
+        risk: 'low',
+        dependencyIds: [],
+        expectedArtifactKinds: ['notes'],
+      },
+      {
+        id: 'build',
+        role: 'builder',
+        title: 'Build',
+        summary: 'Build',
+        risk: 'low',
+        dependencyIds: ['research'],
+        expectedArtifactKinds: ['report'],
+      },
+      {
+        id: 'review',
+        role: 'reviewer',
+        title: 'Review',
+        summary: 'Run tests',
+        risk: 'high',
+        dependencyIds: ['build'],
+        expectedArtifactKinds: ['review'],
+      },
+    ],
+  };
+
+  const paused = await engine.startMission(reviewPlan);
+  const approvalEvent = events.find((event) => event.type === 'runtime.approval_requested');
+  assert.equal(paused.mission.status, 'waiting_input');
+  assert.equal(approvalEvent.partial.payload.action, 'command.run');
+
+  const resumed = await engine.resolveApproval(
+    approvalEvent.partial.payload.approvalId,
+    'approved',
+    'approve tests',
+  );
+
+  assert.equal(resumed.snapshot.mission.status, 'completed');
+  assert.deepEqual(executedCommands, ['npm.cmd run runtime:test']);
+  assert.equal(events.some((event) => event.type === 'runtime.tool_called'), true);
+});
+
+test('mission engine notifies snapshots and artifact records for journaling', async () => {
+  const snapshots = [];
+  const artifacts = [];
+  const engine = createMissionEngine({
+    workspaceRoot: process.cwd(),
+    emit: () => {},
+    onMissionSnapshot: (snapshot) => snapshots.push(snapshot),
+    onArtifactCreated: (artifact) => artifacts.push(artifact),
+    workerEngine: {
+      runTask: async ({ task }) => ({
+        status: 'completed',
+        summary: `${task.id} done`,
+        artifact: {
+          artifactId: `artifact-${task.id}`,
+          title: `${task.id} artifact`,
+          path: `.local-runtime/artifacts/${task.id}.md`,
+          kind: 'notes',
+          summary: `${task.id} summary`,
+          workspaceBacked: true,
+          previewable: true,
+        },
+      }),
+    },
+  });
+
+  await engine.startMission({
+    missionId: 'mission-journal-hooks',
+    missionTitle: 'Journal hooks',
+    missionSummary: 'Notify journal callbacks.',
+    tasks: [
+      {
+        id: 'research',
+        role: 'researcher',
+        title: 'Research',
+        summary: 'Research',
+        risk: 'low',
+        dependencyIds: [],
+        expectedArtifactKinds: ['notes'],
+      },
+    ],
+  });
+
+  assert.ok(snapshots.length >= 3);
+  assert.equal(snapshots.at(-1).mission.status, 'completed');
+  assert.equal(artifacts.length, 1);
+  assert.equal(artifacts[0].missionId, 'mission-journal-hooks');
+  assert.equal(artifacts[0].taskId, 'research');
+  assert.equal(artifacts[0].workerId, 'worker-research');
 });

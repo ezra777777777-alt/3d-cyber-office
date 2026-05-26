@@ -3,6 +3,17 @@ import { useRuntimeStore } from '@/store/runtimeStore';
 import { useUIStore } from '@/store/uiStore';
 import { labelForRuntimeMode, labelForRuntimeStatus } from '@/i18n/zh';
 
+const VISUAL_MODE_LABELS = {
+  low: '精简',
+  normal: '标准',
+  showcase: '展示',
+} as const;
+
+const OFFICE_STYLE_LABELS = {
+  current: '经典空间',
+  claw3d: '视频级空间',
+} as const;
+
 export function StatusBar() {
   const tasks = useOfficeStore((s) => s.getAllTasks());
   const agents = useOfficeStore((s) => s.getAllAgents());
@@ -49,7 +60,7 @@ export function StatusBar() {
                 : 'border-gray-600 text-gray-500 hover:border-gray-400'
             }`}
           >
-            {mode === 'low' ? 'Low' : mode === 'normal' ? 'Normal' : 'Show'}
+            {VISUAL_MODE_LABELS[mode]}
           </button>
         ))}
       </div>
@@ -64,7 +75,7 @@ export function StatusBar() {
                 : 'border-gray-600 text-gray-500 hover:border-gray-400'
             }`}
           >
-            {style === 'current' ? 'Plan18' : 'Claw3D'}
+            {OFFICE_STYLE_LABELS[style]}
           </button>
         ))}
       </div>

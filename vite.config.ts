@@ -20,9 +20,6 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes('node_modules/three') || id.includes('@react-three')) return 'vendor-3d';
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/zustand')) return 'vendor-react';
-          if (id.includes('/src/ui/dashboard/')) return 'dashboard';
-          if (id.includes('/src/ui/commander/')) return 'commander';
-          if (id.includes('/src/runtime/')) return 'runtime';
         },
       },
     },

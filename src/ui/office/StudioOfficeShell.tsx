@@ -1,20 +1,21 @@
 import { useState } from 'react';
+import { useCommanderStore } from '@/store/commanderStore';
 import { useOfficeStore } from '@/store/officeStore';
 import { ResetCameraBtn } from '@/ui/ResetCameraBtn';
 import { SidePanel } from '@/ui/SidePanel';
 
 const text = {
-  lobster: '\u9f99\u867e',
-  mainAgentRunning: 'Main Agent · \u8fd0\u884c',
-  idle: '\u7a7a\u95f2',
-  model: '\u6a21\u578b',
-  task: '\u4efb\u52a1',
-  artifact: '\u4ea7\u7269',
-  collapsePanel: '\u6536\u8d77 Main Agent \u9762\u677f',
-  primary: '\u4e3b',
+  commander: '龙虾 Commander',
+  subtitle: '任务主控',
+  idle: '待命',
+  mission: '任务',
+  team: 'Worker',
+  artifact: '产物',
+  collapsePanel: '收起 Commander 面板',
+  primary: '主',
 };
 
-const bottomLabels = ['\u9f99', '\u7814', '\u7801', '\u5199', '\u6790', '\u5ba1'];
+const bottomLabels = ['主控', '研究', '构建', '写作', '分析', '审阅'];
 
 const isDesktop = () =>
   typeof window !== 'undefined' ? window.innerWidth >= 1180 : true;
@@ -35,10 +36,24 @@ function VideoLeftRail() {
 
 function VideoMainAgentPanel() {
   const [open, setOpen] = useState(isDesktop);
+  const tasks = useOfficeStore((s) => s.getAllTasks());
+  const agents = useOfficeStore((s) => s.getAllAgents());
+  const selectedMissionId = useCommanderStore((s) => s.selectedMissionId);
+  const mission = useCommanderStore((s) => (s.selectedMissionId ? s.missions[s.selectedMissionId] : undefined));
+  const artifacts = useCommanderStore((s) => s.artifacts);
+  const pendingApprovals = useCommanderStore((s) =>
+    Object.values(s.approvals).filter((approval) => approval.status === 'pending').length,
+  );
+  const missionTaskCount = mission?.taskIds.length ?? tasks.length;
+  const artifactCount = mission
+    ? mission.taskIds.reduce((total, taskId) => total + (mission.tasks[taskId]?.artifactIds.length ?? 0), 0)
+    : Object.keys(artifacts).length;
+  const status = pendingApprovals > 0 ? '待审批' : selectedMissionId ? '指挥中' : text.idle;
+
   if (!open) {
     return (
       <button className="video-main-agent-chip" onClick={() => setOpen(true)} type="button">
-        {text.lobster}
+        {text.commander}
       </button>
     );
   }
@@ -47,18 +62,18 @@ function VideoMainAgentPanel() {
       <div className="video-main-agent-head">
         <div className="video-lobster-icon">L</div>
         <div>
-          <div className="video-main-agent-title">{text.lobster}</div>
-          <div className="video-main-agent-subtitle">{text.mainAgentRunning}</div>
+          <div className="video-main-agent-title">{text.commander}</div>
+          <div className="video-main-agent-subtitle">{text.subtitle}</div>
         </div>
         <button onClick={() => setOpen(false)} type="button" aria-label={text.collapsePanel}>
           x
         </button>
       </div>
-      <div className="video-main-agent-status">{text.idle}</div>
+      <div className={`video-main-agent-status ${pendingApprovals > 0 ? 'is-approval' : ''}`}>{status}</div>
       <div className="video-main-agent-grid">
-        <span>{text.model}</span><strong>claude-opus-4.6</strong>
-        <span>{text.task}</span><strong>11</strong>
-        <span>{text.artifact}</span><strong>12.6M</strong>
+        <span>{text.mission}</span><strong>{missionTaskCount}</strong>
+        <span>{text.team}</span><strong>{agents.length}</strong>
+        <span>{text.artifact}</span><strong>{artifactCount}</strong>
       </div>
     </aside>
   );

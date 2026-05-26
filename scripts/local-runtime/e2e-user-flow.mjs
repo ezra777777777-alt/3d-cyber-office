@@ -129,6 +129,17 @@ async function waitForHealth(maxRetries = 30) {
   throw new Error('Server did not become healthy in time');
 }
 
+async function waitForJson(url, predicate, timeoutMs = 10000) {
+  const started = Date.now();
+  let last;
+  while (Date.now() - started < timeoutMs) {
+    last = await fetchJson(url).catch((error) => ({ status: 0, body: { error: error.message } }));
+    if (predicate(last)) return last;
+    await sleep(250);
+  }
+  throw new Error(`Timed out waiting for ${url}: ${JSON.stringify(last?.body || last)}`);
+}
+
 async function run() {
   console.log('[e2e] Starting local runtime...');
   const serverProc = spawn('node', [SERVER_SCRIPT], {
@@ -203,6 +214,14 @@ async function run() {
     const missionEvents = sse.events.filter((e) => e.missionId === missionRes.body.missionId);
     const completedTasks = missionEvents.filter((e) => e.type === 'runtime.task_completed');
     const artifacts = missionEvents.filter((e) => e.type === 'runtime.artifact_created');
+    const groundedArtifacts = artifacts.filter((event) => {
+      const summary = JSON.stringify(event.payload || {});
+      return (
+        summary.includes('package.json') ||
+        summary.includes('scripts/local-runtime') ||
+        summary.includes('src/')
+      );
+    });
 
     console.log(`[e2e] Completed tasks: ${completedTasks.length}`);
     console.log(`[e2e] Artifacts created: ${artifacts.length}`);
@@ -216,6 +235,83 @@ async function run() {
 
     if (completedTasks.length < 3) {
       errors.push(`Expected at least 3 completed tasks, got ${completedTasks.length}`);
+    }
+
+    if (groundedArtifacts.length === 0) {
+      errors.push('Expected at least one artifact to reference workspace context.');
+    }
+
+    console.log('[e2e] Checking mission history API...');
+    const historyList = await waitForJson(
+      `${BASE}/missions`,
+      (res) =>
+        res.status === 200 &&
+        res.body?.missions?.some((mission) => mission.missionId === missionRes.body.missionId),
+    );
+    const historyMission = historyList.body.missions.find(
+      (mission) => mission.missionId === missionRes.body.missionId,
+    );
+    if (historyMission?.status !== 'completed') {
+      errors.push(`Expected history mission status completed, got ${historyMission?.status}`);
+    }
+
+    const historySnapshot = await waitForJson(
+      `${BASE}/missions/${encodeURIComponent(missionRes.body.missionId)}`,
+      (res) => res.status === 200 && res.body?.mission?.mission?.status === 'completed',
+    );
+    if (historySnapshot.body.mission.tasks?.length < 3) {
+      errors.push('Expected history mission snapshot to include tasks.');
+    }
+
+    const historyEvents = await waitForJson(
+      `${BASE}/missions/${encodeURIComponent(missionRes.body.missionId)}/events`,
+      (res) =>
+        res.status === 200 &&
+        Array.isArray(res.body?.events) &&
+        res.body.events.some((event) => event.type === 'runtime.mission_completed'),
+    );
+    const historyEventTypes = new Set(historyEvents.body.events.map((event) => event.type));
+    for (const type of [
+      'runtime.task_created',
+      'runtime.approval_requested',
+      'runtime.approval_resolved',
+      'runtime.tool_called',
+      'runtime.mission_completed',
+    ]) {
+      if (!historyEventTypes.has(type)) {
+        errors.push(`History events missing ${type}`);
+      }
+    }
+
+    const historyArtifacts = await waitForJson(
+      `${BASE}/missions/${encodeURIComponent(missionRes.body.missionId)}/artifacts`,
+      (res) => res.status === 200 && Array.isArray(res.body?.artifacts) && res.body.artifacts.length > 0,
+    );
+    const previewableArtifact = historyArtifacts.body.artifacts.find(
+      (artifact) => artifact.previewable !== false,
+    );
+    if (!previewableArtifact) {
+      errors.push('Expected at least one previewable history artifact.');
+    } else {
+      const artifactContent = await waitForJson(
+        `${BASE}/missions/${encodeURIComponent(missionRes.body.missionId)}/artifacts/${encodeURIComponent(previewableArtifact.artifactId)}`,
+        (res) => res.status === 200 && typeof res.body?.content === 'string' && res.body.content.length > 0,
+      );
+      if (!String(artifactContent.body.content).trim().startsWith('#')) {
+        errors.push('Expected artifact content endpoint to return markdown content.');
+      }
+    }
+
+    const historyText = JSON.stringify({
+      historyList: historyList.body,
+      historySnapshot: historySnapshot.body,
+      historyEvents: historyEvents.body,
+      historyArtifacts: historyArtifacts.body,
+    });
+    for (const secretProbe of ['sk-test', 'ANTHROPIC_API_KEY', 'OPENAI_API_KEY']) {
+      if (historyText.includes(secretProbe)) {
+        errors.push(`History response leaked secret-like string: ${secretProbe}`);
+      }
     }
 
     // Check for runtime.adapter_error (should NOT appear — regression check)

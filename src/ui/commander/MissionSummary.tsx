@@ -1,4 +1,5 @@
 import { useCommanderStore } from '@/store/commanderStore';
+import { useUIStore } from '@/store/uiStore';
 import { summarizeMission } from '@/commander/commanderTesting';
 import { buildCommanderExperienceState } from '@/commander/commanderExperience';
 
@@ -7,6 +8,7 @@ export function MissionSummary() {
   const missions = useCommanderStore((state) => state.missions);
   const approvals = useCommanderStore((state) => state.approvals);
   const artifacts = useCommanderStore((state) => state.artifacts);
+  const setActiveModule = useUIStore((state) => state.setActiveModule);
 
   const mission = selectedMissionId ? missions[selectedMissionId] : undefined;
   if (!mission) return null;
@@ -42,6 +44,14 @@ export function MissionSummary() {
       <p className="mission-summary-text">
         {experience.nextAction}
       </p>
+      {mission.id && (
+        <button
+          className="cyber-btn mb-3 text-xs"
+          onClick={() => setActiveModule('history')}
+        >
+          查看历史回放
+        </button>
+      )}
       <div className="mission-summary-grid">
         <div className="summary-stat">
           <span className="summary-stat-value">{summary.completedCount}/{summary.taskCount}</span>

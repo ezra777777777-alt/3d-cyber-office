@@ -7,6 +7,7 @@ export type ModuleId =
   | 'tasks'
   | 'logs'
   | 'files'
+  | 'history'
   | 'cronjobs'
   | 'gateway'
   | 'review'
@@ -24,6 +25,7 @@ export const moduleLabels: Record<ModuleId, string> = {
   review: '复盘',
   rest: '休息区',
   migration: '迁移',
+  history: '历史',
 };
 
 export const moduleShortLabels: Record<ModuleId, string> = {
@@ -37,6 +39,7 @@ export const moduleShortLabels: Record<ModuleId, string> = {
   review: '复盘',
   rest: '休息',
   migration: '迁移',
+  history: '历史',
 };
 
 export const taskStatusLabels: Record<TaskStatus, string> = {
