@@ -466,13 +466,12 @@
 
   .studio-commander-dock-slot {
     position: absolute;
-    left: 50%;
+    left: 62px;
     top: 14px;
-    transform: translateX(-50%);
     z-index: 24;
-    max-width: min(360px, calc(100vw - 180px));
-    max-height: 42px;
-    overflow: hidden;
+    width: min(340px, calc(100vw - 360px));
+    max-height: calc(100% - 108px);
+    overflow: visible;
     pointer-events: auto;
   }
 
@@ -496,7 +495,11 @@
       display: none;
     }
     .studio-commander-dock-slot {
-      display: none;
+      left: 48px;
+      right: 8px;
+      top: 8px;
+      width: auto;
+      max-height: calc(100% - 184px);
     }
     .studio-bottom-bar {
       max-width: calc(100vw - 24px);
@@ -788,6 +791,257 @@
     color: white;
   }
 
+  .launchpad-page {
+    background:
+      radial-gradient(circle at 18% 12%, rgba(0, 240, 255, 0.08), transparent 28rem),
+      radial-gradient(circle at 84% 20%, rgba(255, 184, 77, 0.08), transparent 24rem),
+      #0a0a1a;
+  }
+
+  .launchpad-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1.15rem;
+    border: 1px solid rgba(0, 240, 255, 0.18);
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.12), rgba(255, 184, 77, 0.06));
+  }
+
+  .launchpad-hero-blocked {
+    border-color: rgba(255, 51, 102, 0.34);
+    background: linear-gradient(135deg, rgba(255, 51, 102, 0.11), rgba(255, 184, 77, 0.06));
+  }
+
+  .launchpad-hero-action {
+    border-color: rgba(255, 184, 77, 0.38);
+  }
+
+  .launchpad-hero-complete {
+    border-color: rgba(0, 230, 118, 0.3);
+    background: linear-gradient(135deg, rgba(0, 230, 118, 0.1), rgba(0, 240, 255, 0.06));
+  }
+
+  .launchpad-kicker {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: #f0a500;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    font-weight: 800;
+  }
+
+  .launchpad-hero h3 {
+    margin: 0;
+    color: white;
+    font-size: clamp(1.2rem, 2.2vw, 2rem);
+    font-weight: 800;
+  }
+
+  .launchpad-hero p {
+    margin-top: 0.4rem;
+    max-width: 42rem;
+    color: rgb(190 200 220);
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+
+  .launchpad-primary {
+    width: auto;
+    min-width: 9.5rem;
+    padding-inline: 1rem;
+  }
+
+  .launchpad-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
+    gap: 1rem;
+  }
+
+  .launchpad-panel {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.75rem;
+    background: rgba(12, 16, 34, 0.82);
+    padding: 1rem;
+  }
+
+  .launchpad-panel-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .launchpad-panel-head span {
+    color: rgb(156 163 175);
+    font-size: 0.72rem;
+  }
+
+  .launchpad-panel-head strong {
+    color: #e0e0f0;
+    font-size: 0.82rem;
+    text-align: right;
+  }
+
+  .launchpad-steps ol {
+    display: grid;
+    gap: 0.55rem;
+    list-style: none;
+  }
+
+  .launchpad-step {
+    position: relative;
+    padding: 0.72rem 0.8rem 0.72rem 2.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 0.6rem;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .launchpad-step::before {
+    content: "";
+    position: absolute;
+    left: 0.82rem;
+    top: 0.9rem;
+    width: 0.58rem;
+    height: 0.58rem;
+    border-radius: 999px;
+    background: #666688;
+  }
+
+  .launchpad-step-action {
+    border-color: rgba(255, 184, 77, 0.32);
+    background: rgba(255, 184, 77, 0.06);
+  }
+
+  .launchpad-step-ready {
+    border-color: rgba(0, 240, 255, 0.2);
+  }
+
+  .launchpad-step-done {
+    border-color: rgba(0, 230, 118, 0.18);
+  }
+
+  .launchpad-step-action::before {
+    background: #f0a500;
+  }
+
+  .launchpad-step-ready::before {
+    background: #00f0ff;
+  }
+
+  .launchpad-step-done::before {
+    background: #00e676;
+  }
+
+  .launchpad-step strong,
+  .launchpad-template-list strong {
+    display: block;
+    color: white;
+    font-size: 0.86rem;
+  }
+
+  .launchpad-step span,
+  .launchpad-template-list span,
+  .launchpad-panel p {
+    display: block;
+    margin-top: 0.25rem;
+    color: rgb(160 170 190);
+    font-size: 0.74rem;
+    line-height: 1.55;
+  }
+
+  .launchpad-step code,
+  .launchpad-command-block code {
+    color: #d7f7ff;
+    font-size: 0.72rem;
+  }
+
+  .launchpad-command-block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0.75rem 0;
+    padding: 0.75rem;
+    border-radius: 0.6rem;
+    background: rgba(0, 0, 0, 0.32);
+    border: 1px solid rgba(0, 240, 255, 0.16);
+  }
+
+  .launchpad-command-block button {
+    color: #00f0ff;
+    font-size: 0.75rem;
+  }
+
+  .launchpad-template-list {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .launchpad-template-list button {
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem;
+    border-radius: 0.6rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .launchpad-template-list button:hover {
+    border-color: rgba(0, 240, 255, 0.28);
+    background: rgba(0, 240, 255, 0.06);
+  }
+
+  .launchpad-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+  }
+
+  @media (max-width: 760px) {
+    .launchpad-page {
+      padding: 0.85rem;
+    }
+
+    .launchpad-hero {
+      grid-template-columns: 1fr;
+      padding: 0.9rem;
+    }
+
+    .launchpad-primary {
+      width: 100%;
+    }
+
+    .launchpad-grid {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .launchpad-panel {
+      padding: 0.85rem;
+    }
+
+    .launchpad-panel-head {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .launchpad-panel-head strong {
+      text-align: left;
+    }
+
+    .launchpad-command-block {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+
   /* Commander dock — left-side collapsible overlay */
   .commander-dock {
     background: rgb(10 10 26 / 0.92);
@@ -1011,6 +1265,46 @@
 
   .commander-intake {
     border-color: rgba(255, 184, 77, 0.28);
+  }
+
+  .commander-template-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .commander-template-chip {
+    border: 1px solid rgba(255, 184, 77, 0.2);
+    border-radius: 0.45rem;
+    background: rgba(255, 184, 77, 0.06);
+    color: #ffd27a;
+    font-size: 0.7rem;
+    padding: 0.28rem 0.55rem;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .commander-template-chip:hover {
+    border-color: rgba(255, 184, 77, 0.45);
+    background: rgba(255, 184, 77, 0.12);
+  }
+
+  .completion-handoff {
+    border-color: rgba(52, 211, 153, 0.36);
+    background: rgba(6, 78, 59, 0.14);
+  }
+
+  .completion-handoff p {
+    margin: 0 0 10px;
+    color: #b6c8d8;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .completion-handoff-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
   /* Mission graph */

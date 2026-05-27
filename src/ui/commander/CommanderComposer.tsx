@@ -11,12 +11,14 @@ import {
   startWorkerExecutionWithAdapter,
 } from '@/ai/commanderRuntimeBridge';
 import type { CommanderAdapterMode } from '@/ai/commanderAdapterTypes';
+import { commanderModeCopy, missionTemplateCopy } from '@/i18n/productCopy';
+import { missionTemplates } from '@/commander/missionTemplates';
 
 const MODES: { key: CommanderAdapterMode; label: string }[] = [
-  { key: 'demo', label: 'Demo' },
-  { key: 'mock_ai', label: 'Mock AI' },
-  { key: 'local_runtime', label: '本地 Runtime' },
-  { key: 'guarded_real', label: '真实占位' },
+  { key: 'demo', label: commanderModeCopy.demo },
+  { key: 'mock_ai', label: commanderModeCopy.mock_ai },
+  { key: 'local_runtime', label: commanderModeCopy.local_runtime },
+  { key: 'guarded_real', label: commanderModeCopy.guarded_real },
 ];
 
 const WORKER_ID_BY_ROLE: Record<string, string> = {
@@ -35,6 +37,16 @@ export function CommanderComposer() {
   const setAdapterMode = useCommanderStore((state) => state.setAdapterMode);
   const setAdapterStatus = useCommanderStore((state) => state.setAdapterStatus);
   const setAdapterError = useCommanderStore((state) => state.setAdapterError);
+
+  function applyTemplate(templateId: string) {
+    const template = missionTemplates.find((item) => item.id === templateId);
+    if (!template) return;
+    setDraft({
+      goal: template.goal,
+      materialNote: template.materialNote,
+      constraintsText: template.constraintsText,
+    });
+  }
 
   async function handleCreateMission() {
     if (adapterMode === 'demo') {
@@ -130,12 +142,29 @@ export function CommanderComposer() {
       {adapterMode !== 'demo' && (
         <p className="text-xs text-gray-500 mb-2">
           {adapterMode === 'mock_ai'
-            ? 'Mock AI 会模拟真实规划和审批，不会执行真实副作用。'
+            ? '模拟 AI 会演示真实规划、审批和产物流程，不会执行真实副作用。'
             : adapterMode === 'local_runtime'
-              ? '本地 Runtime 会把目标发送到 localhost 进程，由外部进程回传任务、审批和产物事件。'
-              : '真实占位模式不会请求 token。真实 AI 接入必须通过外部 Runtime Adapter。'}
+              ? '本地 Runtime 会把目标发送到 localhost 进程，真实审批、工具调用和产物会回传到办公室。'
+              : '真实接入占位不会在浏览器里请求 token。模型密钥必须只放在外部 Runtime 中。'}
         </p>
       )}
+
+      <div className="commander-template-row" aria-label="Commander 任务模板">
+        {missionTemplates.map((template) => {
+          const copy = missionTemplateCopy.find((item) => item.id === template.id);
+          return (
+            <button
+              key={template.id}
+              type="button"
+              className="commander-template-chip"
+              onClick={() => applyTemplate(template.id)}
+              title={copy?.description ?? template.title}
+            >
+              {template.title}
+            </button>
+          );
+        })}
+      </div>
 
       {adapterError && (
         <div className="text-xs text-red-300 border border-red-500/30 rounded p-2 mb-2 bg-red-500/5">

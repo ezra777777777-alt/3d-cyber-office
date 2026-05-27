@@ -2,6 +2,7 @@ import type { AgentStatus, EventType, TaskStatus } from '@/core/types';
 import type { RuntimeConnectionStatus, RuntimeMode } from '@/runtime/runtimeTypes';
 
 export type ModuleId =
+  | 'launchpad'
   | 'office'
   | 'calendar'
   | 'tasks'
@@ -15,31 +16,33 @@ export type ModuleId =
   | 'migration';
 
 export const moduleLabels: Record<ModuleId, string> = {
+  launchpad: '开始',
   office: '办公室',
   calendar: '日程',
   tasks: '任务',
   logs: '日志',
   files: '文件',
+  history: '历史',
   cronjobs: '定时任务',
   gateway: '网关',
   review: '复盘',
   rest: '休息区',
   migration: '迁移',
-  history: '历史',
 };
 
 export const moduleShortLabels: Record<ModuleId, string> = {
-  office: '办公室',
+  launchpad: '开始',
+  office: '办公',
   calendar: '日程',
   tasks: '任务',
   logs: '日志',
   files: '文件',
+  history: '历史',
   cronjobs: '定时',
   gateway: '网关',
   review: '复盘',
   rest: '休息',
   migration: '迁移',
-  history: '历史',
 };
 
 export const taskStatusLabels: Record<TaskStatus, string> = {
@@ -50,7 +53,7 @@ export const taskStatusLabels: Record<TaskStatus, string> = {
   running: '运行中',
   waiting_input: '等待输入',
   approval_required: '等待审批',
-  blocked: '阻塞',
+  blocked: '已阻塞',
   failed: '失败',
   completed: '已完成',
   cancelled: '已取消',
@@ -62,7 +65,7 @@ export const agentStatusLabels: Record<AgentStatus, string> = {
   working: '工作中',
   waiting_input: '等待输入',
   approval_required: '等待审批',
-  blocked: '阻塞',
+  blocked: '已阻塞',
   failed: '失败',
   completed: '已完成',
   resting: '休息中',
@@ -81,7 +84,7 @@ export const runtimeStatusLabels: Record<RuntimeConnectionStatus, string> = {
   idle: '待机',
   connecting: '连接中',
   connected: '已连接',
-  degraded: '降级',
+  degraded: '降级运行',
   protocol_mismatch: '协议不匹配',
   disconnected: '已断开',
   error: '错误',

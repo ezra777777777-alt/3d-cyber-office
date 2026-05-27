@@ -20,6 +20,7 @@ const TasksView = lazy(() => import('./dashboard/TasksView').then((m) => ({ defa
 const LogsView = lazy(() => import('./dashboard/LogsView').then((m) => ({ default: m.LogsView })));
 const FilesView = lazy(() => import('./dashboard/FilesView').then((m) => ({ default: m.FilesView })));
 const MissionHistoryView = lazy(() => import('./dashboard/MissionHistoryView').then((m) => ({ default: m.MissionHistoryView })));
+const LaunchpadView = lazy(() => import('./dashboard/LaunchpadView').then((m) => ({ default: m.LaunchpadView })));
 const CronJobsView = lazy(() => import('./dashboard/CronJobsView').then((m) => ({ default: m.CronJobsView })));
 const GatewayStatus = lazy(() => import('./dashboard/GatewayStatus').then((m) => ({ default: m.GatewayStatus })));
 const DailyReview = lazy(() => import('./dashboard/DailyReview').then((m) => ({ default: m.DailyReview })));
@@ -234,7 +235,9 @@ export function AppShell() {
           <div className="flex-1 flex min-h-0">
             <div className="flex-1 min-w-0 overflow-hidden">
               <Suspense fallback={<div className="p-4 text-sm text-gray-400">正在加载工作台...</div>}>
-                {activeModule === 'calendar' ? (
+                {activeModule === 'launchpad' ? (
+                  <LaunchpadView />
+                ) : activeModule === 'calendar' ? (
                   <CalendarView />
                 ) : activeModule === 'tasks' ? (
                   <TasksView />
@@ -264,13 +267,16 @@ export function AppShell() {
             </div>
           </div>
         )}
-        {/* HUD and controls persist across module switches */}
-        <div className="absolute left-2 top-20 z-20 pointer-events-none max-w-[22rem]">
-          <GuidedDemoHud />
-        </div>
-        <div className={`absolute bottom-2 right-2 z-30 pointer-events-auto ${officeVisualStyle === 'claw3d' ? 'video-demo-controls-slot' : ''}`}>
-          <DemoControls />
-        </div>
+        {activeModule === 'office' && (
+          <>
+            <div className="absolute left-2 top-20 z-20 pointer-events-none max-w-[22rem]">
+              <GuidedDemoHud />
+            </div>
+            <div className={`absolute bottom-2 right-2 z-30 pointer-events-auto ${officeVisualStyle === 'claw3d' ? 'video-demo-controls-slot' : ''}`}>
+              <DemoControls />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

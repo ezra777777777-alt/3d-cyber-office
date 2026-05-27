@@ -18,17 +18,18 @@ import {
 describe('Chinese UI labels', () => {
   it('covers every navigation module with Chinese labels', () => {
     expect(getKnownModuleIds()).toEqual([
+      'launchpad',
       'office',
       'calendar',
       'tasks',
       'logs',
       'files',
+      'history',
       'cronjobs',
       'gateway',
       'review',
       'rest',
       'migration',
-      'history',
     ]);
     expect(findMissingLabels(moduleLabels, getKnownModuleIds())).toEqual([]);
     expect(Object.values(moduleLabels).every(hasChineseText)).toBe(true);
@@ -40,7 +41,7 @@ describe('Chinese UI labels', () => {
 
   it('covers common task and agent states', () => {
     expect(taskStatusLabels.completed).toBe('已完成');
-    expect(taskStatusLabels.blocked).toBe('阻塞');
+    expect(taskStatusLabels.blocked).toBe('已阻塞');
     expect(agentStatusLabels.working).toBe('工作中');
     expect(agentStatusLabels.idle).toBe('空闲');
   });

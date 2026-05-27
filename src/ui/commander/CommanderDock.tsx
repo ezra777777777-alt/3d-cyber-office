@@ -10,6 +10,7 @@ import { WorkerRoster } from './WorkerRoster';
 import { ApprovalInbox } from './ApprovalInbox';
 import { ArtifactRail } from './ArtifactRail';
 import { MissionSummary } from './MissionSummary';
+import { CompletionHandoff } from './CompletionHandoff';
 
 export function CommanderDock() {
   const commanderOpen = useUIStore((state) => state.commanderOpen);
@@ -49,6 +50,7 @@ export function CommanderDock() {
           {mission && (
             <>
               <MissionSummary />
+              <CompletionHandoff />
               <ApprovalInbox />
               <MissionGraph mission={mission} />
               <ArtifactRail />

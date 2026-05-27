@@ -32,6 +32,7 @@
 - [x] Files artifact flow is covered by runtime E2E and Plan 31 UI QA.
 - [x] Mobile 390px layout has no horizontal overflow or control overlap.
 - [x] Runtime Gateway health/stale/offline states are covered by runtime health tests and `doctor`.
+- [x] Plan 34 Launchpad first-run path is covered by desktop and mobile browser QA.
 
 ## Release Docs
 
@@ -49,3 +50,4 @@
 - [x] Plan 31 Artifact Center and Mission Replay accepted.
 - [x] Plan 32 Video-Grade Visual V2 accepted.
 - [ ] Plan 33 Performance and Release Packaging accepted.
+- [ ] Plan 34 First-Run Product Experience accepted after source-control closure.
