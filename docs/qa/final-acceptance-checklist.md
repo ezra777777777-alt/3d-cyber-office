@@ -105,3 +105,15 @@
 - [x] Release package excludes secrets and generated state.
 - [x] Migration docs distinguish browser state from runtime history/artifacts.
 - [x] Branch is committed and pushed.
+
+## Plan 34 First-Run Product Experience
+
+- [x] Navigation and Commander copy are readable Chinese.
+- [x] `src/i18n/textIntegrity.test.ts` prevents central label mojibake regression.
+- [x] Launchpad shows startup command and runtime readiness.
+- [x] Launchpad can direct the user to Gateway or Office based on state.
+- [x] Mission templates fill Commander draft fields.
+- [x] Completed mission handoff links to Files, History, and next mission.
+- [x] Desktop browser QA passed with screenshot evidence.
+- [x] Mobile 390px browser QA passed with no horizontal overflow.
+- [ ] GitHub release/source-control closure is complete.

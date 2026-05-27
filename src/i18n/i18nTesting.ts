@@ -5,7 +5,7 @@ export function getKnownModuleIds(): ModuleId[] {
 }
 
 export function hasChineseText(value: string): boolean {
-  return /[一-鿿]/.test(value);
+  return /[\u4e00-\u9fff]/.test(value);
 }
 
 export function findMissingLabels<T extends string>(

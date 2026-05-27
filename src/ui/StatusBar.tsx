@@ -1,7 +1,8 @@
 import { useOfficeStore } from '@/store/officeStore';
 import { useRuntimeStore } from '@/store/runtimeStore';
 import { useUIStore } from '@/store/uiStore';
-import { labelForRuntimeMode, labelForRuntimeStatus } from '@/i18n/zh';
+import { labelForRuntimeMode } from '@/i18n/zh';
+import { readableRuntimeState } from '@/i18n/productCopy';
 
 const VISUAL_MODE_LABELS = {
   low: '精简',
@@ -35,7 +36,7 @@ export function StatusBar() {
     { label: '任务', value: total, color: '#e0e0f0' },
     { label: '运行中', value: running, color: '#00f0ff' },
     { label: '等待中', value: waitingInput, color: '#f0a500' },
-    { label: '失败', value: failed, color: failed > 0 ? '#ff3366' : '#666688' },
+    { label: '异常', value: failed, color: failed > 0 ? '#ff3366' : '#666688' },
     { label: '活跃', value: activeAgents, color: '#00e676' },
   ];
 
@@ -81,7 +82,7 @@ export function StatusBar() {
       </div>
       <div className="flex items-center gap-1.5 status-bar-item ml-auto">
         <span className="text-gray-500 status-bar-text">
-          运行时：{labelForRuntimeMode(runtimeMode)} / {labelForRuntimeStatus(runtimeStatus)}
+          运行时：{labelForRuntimeMode(runtimeMode)} / {readableRuntimeState(runtimeStatus)}
         </span>
         {lastHeartbeatAt && (
           <span className="status-bar-text text-gray-500">

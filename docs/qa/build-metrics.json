@@ -7,29 +7,29 @@
       "files": [
         {
           "fileName": "assets/index-[hash].js",
-          "kb": 146.95
+          "kb": 152.95
         }
       ],
-      "maxKb": 146.95,
-      "totalKb": 146.95
+      "maxKb": 152.95,
+      "totalKb": 152.95
     },
     "css": {
       "group": "css",
       "files": [
         {
           "fileName": "assets/index-[hash].css",
-          "kb": 35.65
+          "kb": 39.79
         }
       ],
-      "maxKb": 35.65,
-      "totalKb": 35.65
+      "maxKb": 39.79,
+      "totalKb": 39.79
     },
     "other": {
       "group": "other",
       "files": [
         {
           "fileName": "assets/CalendarView-[hash].js",
-          "kb": 5.37
+          "kb": 5.38
         },
         {
           "fileName": "assets/CronJobsView-[hash].js",
@@ -46,6 +46,10 @@
         {
           "fileName": "assets/GatewayStatus-[hash].js",
           "kb": 8.05
+        },
+        {
+          "fileName": "assets/LaunchpadView-[hash].js",
+          "kb": 6.55
         },
         {
           "fileName": "assets/LogsView-[hash].js",
@@ -73,7 +77,7 @@
         }
       ],
       "maxKb": 13.53,
-      "totalKb": 65.68
+      "totalKb": 72.24
     },
     "vendor-3d": {
       "group": "vendor-3d",

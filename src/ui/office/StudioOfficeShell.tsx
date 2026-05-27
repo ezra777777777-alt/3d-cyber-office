@@ -3,6 +3,7 @@ import { useCommanderStore } from '@/store/commanderStore';
 import { useOfficeStore } from '@/store/officeStore';
 import { ResetCameraBtn } from '@/ui/ResetCameraBtn';
 import { SidePanel } from '@/ui/SidePanel';
+import { CommanderDock } from '@/ui/commander/CommanderDock';
 
 const text = {
   commander: '龙虾 Commander',
@@ -96,6 +97,9 @@ export function StudioOfficeShell() {
     <div className="office-presentation-layer video-frame-shell">
       <VideoLeftRail />
       <VideoMainAgentPanel />
+      <div className="studio-commander-dock-slot">
+        <CommanderDock />
+      </div>
       <div className="video-reset-slot"><ResetCameraBtn /></div>
       <VideoBottomAgentBar />
       <div className="office-layer-side pointer-events-auto"><SidePanel /></div>

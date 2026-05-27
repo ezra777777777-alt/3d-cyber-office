@@ -2,6 +2,7 @@ import { useUIStore } from '@/store/uiStore';
 import { moduleLabels, moduleShortLabels, type ModuleId } from '@/i18n/zh';
 
 const MODULES: { id: ModuleId }[] = [
+  { id: 'launchpad' },
   { id: 'office' },
   { id: 'calendar' },
   { id: 'tasks' },

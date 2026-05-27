@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { GuidedCameraShot } from '@/demo/guidedDemoTypes';
+import type { ModuleId } from '@/i18n/zh';
 
 interface UIState {
   selectedAgentId: string | null;
   selectedTaskId: string | null;
-  activeModule: 'office' | 'calendar' | 'tasks' | 'logs' | 'files' | 'cronjobs' | 'gateway' | 'review' | 'rest' | 'migration' | string;
+  activeModule: ModuleId | string;
   demoRunning: boolean;
   demoPaused: boolean;
   cameraFocus: [number, number, number] | null;
@@ -22,7 +23,7 @@ interface UIState {
   setVisualMode: (mode: 'low' | 'normal' | 'showcase') => void;
   setOfficeVisualStyle: (style: 'current' | 'claw3d') => void;
   selectTask: (id: string | null) => void;
-  setActiveModule: (module: string) => void;
+  setActiveModule: (module: ModuleId | string) => void;
   setDemoRunning: (running: boolean) => void;
   setDemoPaused: (paused: boolean) => void;
   setCameraFocus: (pos: [number, number, number] | null) => void;
@@ -44,7 +45,7 @@ export const useUIStore = create<UIState>()(
       demoRunning: false,
       demoPaused: false,
       cameraFocus: null,
-      commanderOpen: typeof window !== 'undefined' ? window.innerWidth >= 640 : true,
+      commanderOpen: false,
       selectedMissionTaskId: null,
       guidedDemoTitle: null,
       guidedDemoBody: null,
